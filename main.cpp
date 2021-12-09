@@ -4,11 +4,18 @@
 
 using namespace std;
 
+const string SYLLABUS = "syllabus.csv";
+
 int main()
 {
+    syllabus_t syl;
+    read_csv(SYLLABUS, syl);
+    print_syllabus(syl);
+    return 0;
+    
 	float total_grade = 0.0;
-	char user_choice;
-	char see_grade;
+	char user_choice,
+         see_grade;
 	const char * quiz_scores = "quiz_scores.txt",
 			   * assignment_scores = "assignment_scores.txt",
 			   * homework_scores = "homework_scores.txt";
