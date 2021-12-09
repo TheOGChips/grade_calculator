@@ -1,16 +1,11 @@
-/*
- * Programs.cpp
- *
- *  Created on: Jan 16, 2019
- *      Author: Gabriel
- */
-
 #include "Grade.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 
 using namespace std;
+
+Grade::Grade () {}
 
 Grade::Grade (float percent, unsigned int size, string filename, int dropped)
 {

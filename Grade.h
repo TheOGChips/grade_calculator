@@ -1,12 +1,5 @@
-/*
- * Programs.h
- *
- *  Created on: Jan 16, 2019
- *      Author: Gabriel
- */
-
-#ifndef GRADE_H_
-#define GRADE_H_
+#ifndef GRADE_H
+#define GRADE_H
 
 #include <string>
 
@@ -25,6 +18,7 @@ class Grade
 
 	public:
 
+        Grade ();
 		Grade (float, unsigned int, string, int);
 		~Grade();
 		void calculate_total();
@@ -50,4 +44,4 @@ class Grade
 		int get_num_dropped_grades() const;
 };
 
-#endif /* GRADE_H_ */
+#endif
