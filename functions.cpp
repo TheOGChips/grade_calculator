@@ -135,8 +135,7 @@ void header_error_msg ()
 
 void print_syllabus (syllabus_t syl)
 {
-    const int SIZE = syl.size();
-    for (int i = 0; i < SIZE; i++) {
+    while (!syl.empty()) {
         cout << get<0>(syl.front()) << endl
              << get<1>(syl.front()) << endl
              << get<2>(syl.front()) << endl
