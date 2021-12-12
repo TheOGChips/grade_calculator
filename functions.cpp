@@ -8,42 +8,42 @@ using namespace std;
 
 void add_to_total (float & total_grade, float category)
 {
-	total_grade += category;
+    total_grade += category;
 }
 
 void subtract_from_total (float & total_grade, float category)
 {
-	total_grade -= category;
+    total_grade -= category;
 }
 
 void display_final_grade (float total_grade)
 {
-	cout << "Your final grade is:\t" << fixed << total_grade << endl
-		 << "Final letter grade is:\t";
+    cout << "Your final grade is:\t" << fixed << total_grade << endl
+         << "Final letter grade is:\t";
 
-	if (total_grade >= 90) {
-		cout << "A" << endl;
-	}
+    if (total_grade >= 90) {
+        cout << "A" << endl;
+    }
 
-	else if (total_grade >= 80 and total_grade < 90) {
-		cout << "B" << endl;
-	}
+    else if (total_grade >= 80 and total_grade < 90) {
+        cout << "B" << endl;
+    }
 
-	else if (total_grade >= 70 and total_grade < 80) {
-		cout << "C" << endl;
-	}
+    else if (total_grade >= 70 and total_grade < 80) {
+        cout << "C" << endl;
+    }
 
-	else if (total_grade >= 60 and total_grade < 70) {
-		cout << "D" << endl;
-	}
+    else if (total_grade >= 60 and total_grade < 70) {
+        cout << "D" << endl;
+    }
 
-	else {
-		cout << "F" << endl;
-	}
+    else {
+        cout << "F" << endl;
+    }
 
-	cout << endl
-		 << endl
-		 << endl;
+    cout << endl
+         << endl
+         << endl;
 }
 
 void read_syllabus (const string FILENAME, syllabus_t & syl)
@@ -102,28 +102,6 @@ void read_syllabus (const string FILENAME, syllabus_t & syl)
 
 void check_headers (string headers, string delims)
 {
-    /*char headers_cstr[headers.size() + 1];
-    strcpy(headers_cstr, headers.c_str());
-    
-    string percent = strtok(headers_cstr, delims.c_str());
-    if (percent != "percent") {
-        header_error_msg();
-    }
-    
-    string entries = strtok(nullptr, delims.c_str());
-    if (entries != "size") {
-        header_error_msg();
-    }
-    
-    string name = strtok(nullptr, delims.c_str());
-    if (name != "filename") {
-        header_error_msg();
-    }
-    
-    string dropped = strtok(nullptr, delims.c_str());
-    if (dropped != "dropped") {
-        header_error_msg();
-    }*/
     if (headers != "category,percent,size,filename,dropped") {
         header_error_msg();
     }
