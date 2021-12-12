@@ -16,6 +16,7 @@ class Grade
 		float grade_total;
 		int num_dropped_grades;
         string category;
+        string filename;
 
 	public:
 
@@ -37,6 +38,7 @@ class Grade
 		void set_grade_total ();
 		void set_num_dropped_grades (int);
         void set_category (string);
+        void set_filename (string);
 
 		float get_percent_grade () const;
 		int get_num_elements () const;
@@ -45,6 +47,7 @@ class Grade
 		float get_grade_total () const;
 		int get_num_dropped_grades () const;
         string get_category_name () const;
+        string get_filename() const;
 };
 
 #endif

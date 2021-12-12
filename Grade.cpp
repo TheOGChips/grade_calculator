@@ -7,11 +7,12 @@ using namespace std;
 
 Grade::Grade (string category, float percent, unsigned int size, string filename, int dropped)
 {
-	set_percent_grade(percent);
-	set_num_elements(size, filename);
+    set_percent_grade(percent);
+    set_num_elements(size, filename);
 	set_num_dropped_grades(dropped);
 	set_max_points();
-	set_scores(filename);
+    set_filename(filename);
+	set_scores(get_filename());
 	set_grade_total();
     set_category(category);
 }
@@ -24,11 +25,10 @@ void Grade::set_percent_grade (float percent)
 void Grade::set_num_elements (const unsigned int SIZE, string filename)
 {
 	const unsigned int PREV_SIZE = line_count(filename);
-
 	if (PREV_SIZE != SIZE) {
 		overwrite_file(PREV_SIZE, SIZE, filename);
 	}
-
+    
 	else {
 		num_elements = SIZE;
 	}
@@ -39,16 +39,20 @@ unsigned int Grade::line_count (string filename)
 	unsigned int count = 0;
 	ifstream infile;
 	infile.open(filename.c_str());
-
+    
+    if (infile.fail()) {    //NOTE: There might be a better place to put this
+        return 0;
+    }
+    
 	while (!infile.eof()) {
 		string input;
 		getline(infile, input);
-
+        
 		if (input != "") {
 			count++;
 		}
 	}
-
+    
 	infile.close();
 	return count;
 }
@@ -99,7 +103,7 @@ void Grade::set_scores(string filename)
 	read_scores_from_file (filename);
 }
 
-void Grade::set_grade_total()
+void Grade::set_grade_total ()
 {
 	grade_total = 0.0;
 	calculate_total();
@@ -115,12 +119,17 @@ void Grade::set_category (string category)
     this->category = category;
 }
 
-Grade::~Grade()
+void Grade::set_filename (string filename)
 {
-	//delete [] scores;    //TODO: Uncomment this when the time comes
+    this->filename = filename;
 }
 
-void Grade::calculate_total()
+Grade::~Grade ()
+{
+	//delete [] scores;    //NOTE: Apparently not needed since grades is new'd'
+}
+
+void Grade::calculate_total ()
 {
 	if (get_num_dropped_grades() > 0)
 	{
@@ -137,7 +146,7 @@ void Grade::calculate_total()
 	grade_total = (grade_total / get_max_points()) * get_percent_grade();
 }
 
-void Grade::bubble_sort()
+void Grade::bubble_sort ()
 {
 	float temp;
 	bool no_swaps;
@@ -164,17 +173,17 @@ void Grade::bubble_sort()
 	}
 }
 
-float Grade::get_percent_grade() const
+float Grade::get_percent_grade () const
 {
 	return percent_grade;
 }
 
-int Grade::get_num_elements() const
+int Grade::get_num_elements () const
 {
 	return num_elements;
 }
 
-int Grade::get_max_points() const
+int Grade::get_max_points () const
 {
 	return max_points;
 }
@@ -205,6 +214,11 @@ int Grade::get_num_dropped_grades() const
 string Grade::get_category_name () const
 {
     return category;
+}
+
+string Grade::get_filename () const
+{
+    return filename;
 }
 
 void Grade::read_scores_from_file (string filename)
@@ -240,12 +254,7 @@ void Grade::write_scores_to_file (string filename)
 
 	for (int i = 0; i < get_num_elements(); i++)
 	{
-		outfile << scores[i];
-
-		if (i < get_num_elements() - 1)
-		{
-			outfile << endl;
-		}
+		outfile << scores[i] << endl;
 	}
 
 	outfile.close();
