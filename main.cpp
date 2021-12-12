@@ -34,15 +34,17 @@ int main()
     
     do
     {
-        cout << "Which category do you want to add a grade to?" << endl
+        cout << endl
+             << "------ MENU ------" << endl
              << endl;
         
         for (int menu_item = 0; menu_item < NUM_CATEGORIES; menu_item++) {
             cout << menu_item + 1 << ". " << grades[menu_item].get_category_name() << endl;
         }
         cout << DISPLAY_GRADE << ". Display final grade" << endl
-             << EXIT << ". Exit" << endl;
-        
+             << EXIT << ". Exit" << endl
+             << endl        
+             << "Which category do you want to add a grade to?\t";
         cin >> user_choice;
         
         if (user_choice >= 1 and user_choice <= NUM_CATEGORIES) {
@@ -66,11 +68,10 @@ int main()
                 {
                     display_final_grade (total_grade * 100);
                 }
-
-                cout << endl;
             } while (see_grade != 'y' and see_grade != 'Y' and see_grade != 'n' and see_grade != 'N');
 
-            cout << "Exiting program..." << endl;
+            cout << "Exiting program..." << endl
+                 << endl;
         }
         
         else {

@@ -18,7 +18,8 @@ void subtract_from_total (float & total_grade, float category)
 
 void display_final_grade (float total_grade)
 {
-    cout << "Your final grade is:\t" << fixed << total_grade << endl
+    cout << endl
+         << "Your final grade is:\t" << fixed << total_grade << endl
          << "Final letter grade is:\t";
 
     if (total_grade >= 90) {
@@ -41,9 +42,7 @@ void display_final_grade (float total_grade)
         cout << "F" << endl;
     }
 
-    cout << endl
-         << endl
-         << endl;
+    cout << endl;
 }
 
 void read_syllabus (const string FILENAME, syllabus_t & syl)
