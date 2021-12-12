@@ -15,7 +15,8 @@ int main()
     print_syllabus(syl);
     
     float total_grade = 0.0;
-    unsigned int user_choice;
+    unsigned int choice;
+    string user_choice;
     char see_grade;
     const int NUM_CATEGORIES = syl.size(),
               DISPLAY_GRADE = NUM_CATEGORIES + 1,
@@ -53,20 +54,28 @@ int main()
              << "Which category do you want to add a grade to?\t";
         cin >> user_choice;
         
-        
-        if (user_choice >= 1 and user_choice <= NUM_CATEGORIES) {
-            subtract_from_total(total_grade, grades[user_choice - 1].get_grade_total());
-            grades[user_choice - 1].enter_new_score();
-            grades[user_choice - 1].calculate_total();
-            add_to_total(total_grade, grades[user_choice - 1].get_grade_total());
-            grades[user_choice - 1].write_scores_to_file(grades[user_choice - 1].get_filename());
+        try {
+            choice = stoi(user_choice);
         }
         
-        else if (user_choice == DISPLAY_GRADE) {
+        catch (invalid_argument) {
+            choice = 0;
+        }
+        
+        
+        if (choice >= 1 and choice <= NUM_CATEGORIES) {
+            subtract_from_total(total_grade, grades[choice - 1].get_grade_total());
+            grades[choice - 1].enter_new_score();
+            grades[choice - 1].calculate_total();
+            add_to_total(total_grade, grades[choice - 1].get_grade_total());
+            grades[choice - 1].write_scores_to_file(grades[choice - 1].get_filename());
+        }
+        
+        else if (choice == DISPLAY_GRADE) {
             display_final_grade (total_grade * 100);
         }
         
-        else if (user_choice == EXIT) {
+        else if (choice == EXIT) {
             do {
                 cout << "Would you like to see your final grade? (y/n)\t";
                 cin >> see_grade;
@@ -85,7 +94,7 @@ int main()
             cout << "Invalid option!" << endl
                  << "Choose a valid number option from the main menu." << endl;
         }
-    } while (user_choice != EXIT);
+    } while (choice != EXIT);
     
     /*for (int i = 0; i < NUM_CATEGORIES; i++) {  //First, free the memory taken up by the scores array
         grades.at(i).dealloc_scores();
