@@ -8,12 +8,19 @@ using namespace std;
 Grade::Grade (string category, float percent, unsigned int size, string filename, int dropped)
 {
     set_percent_grade(percent);
+    cout << __LINE__ << endl;
     set_num_elements(size, filename);
+    cout << __LINE__ << endl;
     set_num_dropped_grades(dropped);
+    cout << __LINE__ << endl;
     set_max_points();
+    cout << __LINE__ << endl;
     set_filename(filename);
+    cout << __LINE__ << endl;
     set_scores(get_filename());
+    cout << __LINE__ << endl;
     set_grade_total();
+    cout << __LINE__ << endl;
     set_category(category);
 }
 
@@ -25,12 +32,16 @@ void Grade::set_percent_grade (float percent)
 void Grade::set_num_elements (const unsigned int SIZE, string filename)
 {
     const unsigned int PREV_SIZE = line_count(filename);
-    if (PREV_SIZE != SIZE) {
+    if (PREV_SIZE > 0 and PREV_SIZE != SIZE) {
+        cout << "Before overwrite" << endl;
+        cout << "PREV_SIZE: " << PREV_SIZE << endl;
+        cout << "SIZE: " << SIZE << endl;
         overwrite_file(PREV_SIZE, SIZE, filename);
     }
 
     else {
         num_elements = SIZE;
+        scores = deque<float>(get_num_elements());
     }
 }
 
@@ -59,7 +70,11 @@ unsigned int Grade::line_count (string filename)
 
 void Grade::overwrite_file (const unsigned int PREV_SIZE, const unsigned int SIZE, string filename)
 {
-    if (PREV_SIZE < SIZE) {     //if there are more scores since before
+    num_elements = PREV_SIZE;
+    scores = deque<float>(get_num_elements());
+    set_scores(filename);
+    scores.resize(SIZE, -1);
+    /*if (PREV_SIZE < SIZE) {     //if there are more scores since before
         num_elements = PREV_SIZE;
         set_scores(filename);
         float temp_scores[SIZE];
@@ -73,23 +88,23 @@ void Grade::overwrite_file (const unsigned int PREV_SIZE, const unsigned int SIZ
             temp_scores[i] = -1;                                //fill in placeholder values for extra indeces
         }
 
-        delete [] scores;                           //reset scores so that it has bigger size
-        scores = new float[get_num_elements()];
+        //delete [] scores;                           //reset scores so that it has bigger size
+        //scores = new float[get_num_elements()];
 
         for (int i = 0; i < get_num_elements(); i++) {
             scores[i] = temp_scores[i];
         }
 
         write_scores_to_file(filename);     //overwrite the file
-        delete [] scores;
-    }
-
-    else {
+        //delete [] scores;
+    }*/
+    cout << __LINE__ << endl;
+    //else {
         num_elements = SIZE;
-        set_scores(filename);           //fill in scores up to new lower size
+        //set_scores(filename);           //fill in scores up to new lower size
         write_scores_to_file(filename); //overwrite the file
-        delete [] scores;               //deallocate scores (will be reallocated later)
-    }
+        //delete [] scores;               //deallocate scores (will be reallocated later)
+    //}
 }
 
 void Grade::set_max_points ()
@@ -99,7 +114,7 @@ void Grade::set_max_points ()
 
 void Grade::set_scores (string filename)
 {
-    scores = new float[get_num_elements()];
+    //scores = new float[get_num_elements()];
     read_scores_from_file (filename);
 }
 
@@ -148,10 +163,16 @@ void Grade::bubble_sort ()
         no_swaps = true;
 
         for (int j = 0; j < get_num_elements() - 1; j++) {
-            if (scores[j] < scores[j + 1]) {
+            /*if (scores[j] < scores[j + 1]) {
                 temp = scores[j];
                 scores[j] = scores[j + 1];
                 scores[j + 1] = temp;
+                no_swaps = false;
+            }*/
+            if (scores.at(j) < scores.at(j + 1)) {
+                temp = scores.at(j);
+                scores.at(j) = scores.at(j + 1);
+                scores.at(j + 1) = temp;
                 no_swaps = false;
             }
         }
@@ -179,12 +200,14 @@ int Grade::get_max_points () const
 
 float Grade::get_score (int element) const
 {
-    if (scores[element] == -1) {
+    //if (scores[element] == -1) {
+    if (scores.at(element) == -1) {
         return 0;
     }
 
     else {
-        return scores[element];
+        //return scores[element];
+        return scores.at(element);
     }
 }
 
@@ -212,18 +235,27 @@ void Grade::read_scores_from_file (string filename)
 {
     ifstream infile;
     infile.open(filename.c_str());
-
+    cout << __LINE__ << endl;
     if (infile.fail()) {
-        for (int i = 0; i < get_num_elements(); i++) {
-            scores[i] = -1;
-        }
-
+        /*for (int i = 0; i < get_num_elements(); i++) {
+            //scores[i] = -1;
+            scores.push_back(-1);
+        }*/
+        cout << __LINE__ << endl;
+        scores.assign(get_num_elements(), -1);
+        cout << __LINE__ << endl;
         write_scores_to_file (filename);
+        cout << __LINE__ << endl;
     }
 
     else {
-        for (int i = 0; i < get_num_elements(); i++) {
-            infile >> scores[i];
+        float temp;
+        for (unsigned int i = 0; i < get_num_elements(); i++) {
+            //infile >> scores[i];
+            cout << "i: " << i << endl;
+            //infile >> scores.at(i);
+            infile >> temp;
+            scores.at(i) = temp;
         }
 
         infile.close();
@@ -236,7 +268,8 @@ void Grade::write_scores_to_file (string filename)
     outfile.open(filename.c_str());
 
     for (int i = 0; i < get_num_elements(); i++) {
-        outfile << scores[i] << endl;
+        //outfile << scores[i] << endl;
+        outfile << scores.at(i) << endl;
     }
 
     outfile.close();
@@ -248,9 +281,16 @@ void Grade::enter_new_score ()
 
     cout << "Enter your newest score:\t";
 
-    while (scores[i] != -1 and i < get_num_elements()) {
+    //while (scores[i] != -1 and i < get_num_elements()) {
+    while (scores.at(i) != -1 and i < get_num_elements()) {
         i++;
     }
 
-    cin >> scores[i];
+    //cin >> scores[i];
+    cin >> scores.at(i);
 }
+/*
+void Grade::dealloc_scores()    //NOTE: This is probably unnecessary, but it felt wrong not freeing this memory and just letting the list do it
+{
+    delete [] scores;
+}*/

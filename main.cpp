@@ -1,6 +1,8 @@
 #include "Grade.h"
 #include <iostream>
 #include "functions.h"
+#include <list>
+#include <cstdlib>
 
 using namespace std;
 
@@ -10,7 +12,7 @@ int main()
 {
     syllabus_t syl;
     read_syllabus(SYLLABUS, syl);
-    //print_syllabus(syl);
+    print_syllabus(syl);
     
     float total_grade = 0.0;
     unsigned int user_choice;
@@ -19,19 +21,23 @@ int main()
               DISPLAY_GRADE = NUM_CATEGORIES + 1,
               EXIT = NUM_CATEGORIES + 2;
               
-    Grade * grades = new Grade[NUM_CATEGORIES];
+    //Grade * grades = new Grade[NUM_CATEGORIES];
+    deque<Grade> grades;
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         string cat = get<0>(syl.front());
         double percentage = static_cast<double>(get<1>(syl.front())) / 100;
         unsigned int size = get<2>(syl.front());
         string filename = get<3>(syl.front());
         int dropped = get<4>(syl.front());
-        
-        grades[i] = Grade (cat, percentage, size, filename, dropped);
+        cout << __LINE__ << endl;
+        //grades[i] = Grade (cat, percentage, size, filename, dropped);
+        grades.push_back(Grade(cat, percentage, size, filename, dropped));
+        cout << __LINE__ << endl;
         syl.pop();
-        add_to_total(total_grade, grades[i].get_grade_total());
+        cout << __LINE__ << endl;
+        add_to_total(total_grade, grades.at(i).get_grade_total());
     }
-    
+    cout << __LINE__ << endl;
     do
     {
         cout << endl
@@ -46,6 +52,7 @@ int main()
              << endl        
              << "Which category do you want to add a grade to?\t";
         cin >> user_choice;
+        
         
         if (user_choice >= 1 and user_choice <= NUM_CATEGORIES) {
             subtract_from_total(total_grade, grades[user_choice - 1].get_grade_total());
@@ -80,6 +87,8 @@ int main()
         }
     } while (user_choice != EXIT);
     
-    delete [] grades;
+    /*for (int i = 0; i < NUM_CATEGORIES; i++) {  //First, free the memory taken up by the scores array
+        grades.at(i).dealloc_scores();
+    }*/
     return 0;
 }
