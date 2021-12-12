@@ -13,7 +13,6 @@ class Grade
         float percent_grade;
         unsigned int num_elements;
         int max_points;
-        //float * scores;
         deque<float> scores;
         float grade_total;
         int num_dropped_grades;
@@ -29,7 +28,6 @@ class Grade
         void read_scores_from_file (string);
         void write_scores_to_file (string);
         void enter_new_score ();
-        //void dealloc_scores();
 
         void set_percent_grade (float);
         void set_num_elements (const unsigned int, string);

@@ -2,7 +2,6 @@
 #include <iostream>
 #include "functions.h"
 #include <list>
-#include <cstdlib>
 
 using namespace std;
 
@@ -12,7 +11,7 @@ int main()
 {
     syllabus_t syl;
     read_syllabus(SYLLABUS, syl);
-    print_syllabus(syl);
+    //print_syllabus(syl);
     
     float total_grade = 0.0;
     unsigned int choice;
@@ -21,8 +20,7 @@ int main()
     const int NUM_CATEGORIES = syl.size(),
               DISPLAY_GRADE = NUM_CATEGORIES + 1,
               EXIT = NUM_CATEGORIES + 2;
-              
-    //Grade * grades = new Grade[NUM_CATEGORIES];
+    
     deque<Grade> grades;
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         string cat = get<0>(syl.front());
@@ -30,15 +28,12 @@ int main()
         unsigned int size = get<2>(syl.front());
         string filename = get<3>(syl.front());
         int dropped = get<4>(syl.front());
-        cout << __LINE__ << endl;
-        //grades[i] = Grade (cat, percentage, size, filename, dropped);
+        
         grades.push_back(Grade(cat, percentage, size, filename, dropped));
-        cout << __LINE__ << endl;
         syl.pop();
-        cout << __LINE__ << endl;
         add_to_total(total_grade, grades.at(i).get_grade_total());
     }
-    cout << __LINE__ << endl;
+    
     do
     {
         cout << endl
@@ -96,8 +91,5 @@ int main()
         }
     } while (choice != EXIT);
     
-    /*for (int i = 0; i < NUM_CATEGORIES; i++) {  //First, free the memory taken up by the scores array
-        grades.at(i).dealloc_scores();
-    }*/
     return 0;
 }
