@@ -46,7 +46,7 @@ void display_final_grade (float total_grade)
 		 << endl;
 }
 
-void read_csv (const string FILENAME, syllabus_t & syl)
+void read_syllabus (const string FILENAME, syllabus_t & syl)
 {
     ifstream infile;
     infile.open(FILENAME.c_str());
@@ -67,10 +67,7 @@ void read_csv (const string FILENAME, syllabus_t & syl)
         grade_t category;
         
         char * temp = strtok(const_cast<char*>(line.c_str()), delims.c_str());
-        if (temp == nullptr) {
-            read_csv_error();
-        }
-        get<0>(category) = atoi(temp);
+        get<0>(category) = string (temp);
         
         temp = strtok(nullptr, delims.c_str());
         if (temp == nullptr) {
@@ -82,13 +79,19 @@ void read_csv (const string FILENAME, syllabus_t & syl)
         if (temp == nullptr) {
             read_csv_error();
         }
-        get<2>(category) = temp;
+        get<2>(category) = atoi(temp);
         
         temp = strtok(nullptr, delims.c_str());
         if (temp == nullptr) {
             read_csv_error();
         }
-        get<3>(category) = atoi(temp);
+        get<3>(category) = temp;
+        
+        temp = strtok(nullptr, delims.c_str());
+        if (temp == nullptr) {
+            read_csv_error();
+        }
+        get<4>(category) = atoi(temp);
         
         syl.push(category);
         getline(infile, line);
@@ -99,7 +102,7 @@ void read_csv (const string FILENAME, syllabus_t & syl)
 
 void check_headers (string headers, string delims)
 {
-    char headers_cstr[headers.size() + 1];
+    /*char headers_cstr[headers.size() + 1];
     strcpy(headers_cstr, headers.c_str());
     
     string percent = strtok(headers_cstr, delims.c_str());
@@ -120,6 +123,9 @@ void check_headers (string headers, string delims)
     string dropped = strtok(nullptr, delims.c_str());
     if (dropped != "dropped") {
         header_error_msg();
+    }*/
+    if (headers != "category,percent,size,filename,dropped") {
+        header_error_msg();
     }
 }
 
@@ -127,7 +133,7 @@ void header_error_msg ()
 {
     cerr << "Error: CSV file format incorrect!" << endl
          << "Use the following format for the header line:" << endl
-         << "\tpercent,size,filename,dropped" << endl
+         << "\tcategory,percent,size,filename,dropped" << endl
          << endl
          << "Exiting..." << endl;
     exit(1);
@@ -140,6 +146,7 @@ void print_syllabus (syllabus_t syl)
              << get<1>(syl.front()) << endl
              << get<2>(syl.front()) << endl
              << get<3>(syl.front()) << endl
+             << get<4>(syl.front()) << endl
              << endl;
         syl.pop();
     }

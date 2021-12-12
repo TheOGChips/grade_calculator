@@ -5,16 +5,15 @@
 
 using namespace std;
 
-Grade::Grade () {}
-
-Grade::Grade (float percent, unsigned int size, string filename, int dropped)
+Grade::Grade (string category, float percent, unsigned int size, string filename, int dropped)
 {
-	set_percent_grade (percent);
-	set_num_elements (size, filename);
+	set_percent_grade(percent);
+	set_num_elements(size, filename);
 	set_num_dropped_grades(dropped);
 	set_max_points();
-	set_scores (filename);
+	set_scores(filename);
 	set_grade_total();
+    set_category(category);
 }
 
 void Grade::set_percent_grade (float percent)
@@ -111,9 +110,14 @@ void Grade::set_num_dropped_grades(int dropped)
 	num_dropped_grades = dropped;
 }
 
+void Grade::set_category (string category)
+{
+    this->category = category;
+}
+
 Grade::~Grade()
 {
-	delete [] scores;
+	//delete [] scores;    //TODO: Uncomment this when the time comes
 }
 
 void Grade::calculate_total()
@@ -196,6 +200,11 @@ float Grade::get_grade_total() const
 int Grade::get_num_dropped_grades() const
 {
 	return num_dropped_grades;
+}
+
+string Grade::get_category_name () const
+{
+    return category;
 }
 
 void Grade::read_scores_from_file (string filename)
