@@ -9,82 +9,76 @@ const string SYLLABUS = "syllabus.csv";
 int main()
 {
     syllabus_t syl;
-    read_csv(SYLLABUS, syl);
-    print_syllabus(syl);
-    return 0;
+    read_syllabus(SYLLABUS, syl);
+    //print_syllabus(syl);
     
-	float total_grade = 0.0;
-	char user_choice,
-         see_grade;
-	const char * quiz_scores = "quiz_scores.txt",
-			   * assignment_scores = "assignment_scores.txt",
-			   * homework_scores = "homework_scores.txt";
+    float total_grade = 0.0;
+    unsigned int user_choice;
+    char see_grade;
+    const int NUM_CATEGORIES = syl.size(),
+              DISPLAY_GRADE = NUM_CATEGORIES + 1,
+              EXIT = NUM_CATEGORIES + 2;
+              
+    Grade * grades = new Grade[NUM_CATEGORIES];
+    for (int i = 0; i < NUM_CATEGORIES; i++) {
+        string cat = get<0>(syl.front());
+        double percentage = static_cast<double>(get<1>(syl.front())) / 100;
+        unsigned int size = get<2>(syl.front());
+        string filename = get<3>(syl.front());
+        int dropped = get<4>(syl.front());
+        
+        grades[i] = Grade (cat, percentage, size, filename, dropped);
+        syl.pop();
+        add_to_total(total_grade, grades[i].get_grade_total());
+    }
+    
+    do
+    {
+        cout << "Which category do you want to add a grade to?" << endl
+             << endl;
+        
+        for (int menu_item = 0; menu_item < NUM_CATEGORIES; menu_item++) {
+            cout << menu_item + 1 << ". " << grades[menu_item].get_category_name() << endl;
+        }
+        cout << DISPLAY_GRADE << ". Display final grade" << endl
+             << EXIT << ". Exit" << endl;
+        
+        cin >> user_choice;
+        
+        if (user_choice >= 1 and user_choice <= NUM_CATEGORIES) {
+            subtract_from_total(total_grade, grades[user_choice - 1].get_grade_total());
+            grades[user_choice - 1].enter_new_score();
+            grades[user_choice - 1].calculate_total();
+            add_to_total(total_grade, grades[user_choice - 1].get_grade_total());
+            grades[user_choice - 1].write_scores_to_file(grades[user_choice - 1].get_filename());
+        }
+        
+        else if (user_choice == DISPLAY_GRADE) {
+            display_final_grade (total_grade * 100);
+        }
+        
+        else if (user_choice == EXIT) {
+            do {
+                cout << "Would you like to see your final grade? (y/n)\t";
+                cin >> see_grade;
 
-	Grade quizzes (0.4, 2, quiz_scores, 0);
-	Grade assignments (0.5, 5, assignment_scores, 0);
-	Grade homework (0.1, 2, homework_scores, 0);
+                if (see_grade == 'y' or see_grade == 'Y')
+                {
+                    display_final_grade (total_grade * 100);
+                }
 
-	add_to_total (total_grade, quizzes.get_grade_total());
-	add_to_total (total_grade, assignments.get_grade_total());
-	add_to_total (total_grade, homework.get_grade_total());
+                cout << endl;
+            } while (see_grade != 'y' and see_grade != 'Y' and see_grade != 'n' and see_grade != 'N');
 
-	do
-	{
-		cout << "Which category do you want to add a grade to?" << endl
-			 << endl
-			 << "1. Quizzes" << endl
-			 << "2. Assignments" << endl
-			 << "3. Homework" << endl
-			 << "4. See final grade" << endl
-			 << "5. End program" << endl;
-		cin >> user_choice;
-
-		switch (user_choice)
-		{
-			case '1': subtract_from_total (total_grade, quizzes.get_grade_total());
-					  quizzes.enter_new_score();
-					  quizzes.calculate_total();
-					  add_to_total (total_grade, quizzes.get_grade_total());
-					  quizzes.write_scores_to_file(quiz_scores);
-					  break;
-
-			case '2': subtract_from_total (total_grade, assignments.get_grade_total());
-					  assignments.enter_new_score();
-					  assignments.calculate_total();
-					  add_to_total (total_grade, assignments.get_grade_total());
-					  assignments.write_scores_to_file(assignment_scores);
-					  break;
-
-			case '3': subtract_from_total (total_grade, homework.get_grade_total());
-					  homework.enter_new_score();
-					  homework.calculate_total();
-					  add_to_total (total_grade, homework.get_grade_total());
-					  homework.write_scores_to_file(homework_scores);
-					  break;
-
-			case '4': display_final_grade (total_grade * 100);
-					  break;
-
-			case '5': do
-					  {
-						  cout << "Would you like to see your final grade? (y/n)\t";
-						  cin >> see_grade;
-
-						  if (see_grade == 'y' or see_grade == 'Y')
-						  {
-							  display_final_grade (total_grade * 100);
-						  }
-
-						  cout << endl;
-					  } while (see_grade != 'y' and see_grade != 'Y' and see_grade != 'n' and see_grade != 'N');
-
-					  cout << "Exiting program..." << endl;
-					  break;
-
-			default: cout << "Invalid option!" << endl
-						  << "Choose a valid number option from the main menu." << endl;
-		}
-	} while (user_choice != '5');
-
-	return 0;
+            cout << "Exiting program..." << endl;
+        }
+        
+        else {
+            cout << "Invalid option!" << endl
+                 << "Choose a valid number option from the main menu." << endl;
+        }
+    } while (user_choice != EXIT);
+    
+    delete [] grades;
+    return 0;
 }
