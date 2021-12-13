@@ -72,7 +72,7 @@ void read_syllabus (const string FILENAME, syllabus_t & syl)
         if (temp == nullptr) {
             read_csv_error();
         }
-        get<1>(category) = atoi(temp);
+        get<1>(category) = atof(temp);
         
         temp = strtok(nullptr, delims.c_str());
         if (temp == nullptr) {

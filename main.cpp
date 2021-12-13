@@ -24,7 +24,7 @@ int main()
     deque<Grade> grades;
     for (int i = 0; i < NUM_CATEGORIES; i++) {
         string cat = get<0>(syl.front());
-        double percentage = static_cast<double>(get<1>(syl.front())) / 100;
+        float percentage = get<1>(syl.front()) / 100;
         unsigned int size = get<2>(syl.front());
         string filename = get<3>(syl.front());
         int dropped = get<4>(syl.front());

@@ -6,7 +6,7 @@
 #include <tuple>
 
 using namespace std;
-#define grade_t tuple<string, int, int, string, int>
+#define grade_t tuple<string, float, int, string, int>
 #define syllabus_t queue<grade_t>
 
 void add_to_total (float&, float);
