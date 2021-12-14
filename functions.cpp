@@ -51,8 +51,10 @@ void read_syllabus (const string FILENAME, syllabus_t & syl)
     infile.open(FILENAME.c_str());
     
     if (infile.fail()) {
-        cerr << "Error: Unable to open " << FILENAME << endl
-             << "Exiting..." << endl;
+        cerr << endl
+             << "Error: Unable to open " << FILENAME << endl
+             << "Exiting..." << endl
+             << endl;
         exit(1);
     }
     
@@ -108,11 +110,13 @@ void check_headers (string headers, string delims)
 
 void header_error_msg ()
 {
-    cerr << "Error: CSV file format incorrect!" << endl
+    cerr << endl
+         << "Error: CSV file format incorrect!" << endl
          << "Use the following format for the header line:" << endl
          << "\tcategory,percent,size,filename,dropped" << endl
          << endl
-         << "Exiting..." << endl;
+         << "Exiting..." << endl
+         << endl;
     exit(1);
 }
 
@@ -131,8 +135,10 @@ void print_syllabus (syllabus_t syl)
 
 void read_csv_error()
 {
-    cerr << "Error: Unable to read value from CSV file" << endl
+    cerr << endl
+         << "Error: Unable to read value from CSV file" << endl
          << "       Ensure that syllabus.csv is filled out correctly."
-         << "Exiting..." << endl;
+         << "Exiting..." << endl
+         << endl;
     exit(1);
 }
