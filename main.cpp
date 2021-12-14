@@ -53,14 +53,25 @@ int main()
             choice = stoi(user_choice);
         }
         
-        catch (invalid_argument) {
+        catch (invalid_argument exc) {
             choice = 0;
         }
         
         
         if (choice >= 1 and choice <= NUM_CATEGORIES) {
             subtract_from_total(total_grade, grades[choice - 1].get_grade_total());
-            grades[choice - 1].enter_new_score();
+            try {
+                grades[choice - 1].enter_new_score();
+            }
+            
+            catch (out_of_range exc) {
+                cerr << endl
+                     << endl
+                     << "Error: Cannot add anymore grades to this category!" << endl
+                     << "       Edit " << SYLLABUS << " if you wish to add more grades" << endl
+                     << "       or edit " << grades[choice - 1].get_filename() << " manually" << endl
+                     << endl;
+            }
             grades[choice - 1].calculate_total();
             add_to_total(total_grade, grades[choice - 1].get_grade_total());
             grades[choice - 1].write_scores_to_file(grades[choice - 1].get_filename());
