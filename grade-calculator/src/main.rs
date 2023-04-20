@@ -38,7 +38,12 @@ impl<'a> Syllabus<'a> {
 
             for line in syllabus.lines().skip(1) {
                 //TODO: Parse each of the remaining lines and construct new GradeCategory objects
-                println!("line: {}", line);
+                let mut tokens: std::str::Split<&str> = line.split(",");
+                let name: &str = match tokens.next() {
+                    Some(token) => token,
+                    None => panic!("Placeholder"),
+                };
+                println!("name: {}", name);
             }
 
             return Syllabus {
