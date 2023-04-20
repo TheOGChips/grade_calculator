@@ -3,18 +3,69 @@ use std::{
     process,
 };
 
-struct _GradeCategory<'a> {
-    name: &'a str,         //formerly category
-    filename: &'a str,
-    percentage: f32,    //formerly percent_grade
-    size: u8,           //formerly num_elements
-    max_points: u8,
-    scores: Vec<f32>,
-    total: f32,         //formerly grade_total
-    dropped: u8,        //formerly num_dropped_grades
+struct Syllabus<'a> {
+    categories: Vec<GradeCategory<'a>>,
+    num_categories: usize,
 }
 
-impl<'a> _GradeCategory<'a> {
+impl<'a> Syllabus<'a> {
+    fn new () -> Self {
+        const FILENAME: &str = "syllabus.csv";
+        const HEADER_LINE: &str = "category,percent,size,filename,dropped";
+        let syllabus: String = match fs::read_to_string(FILENAME) {
+            Ok(text) => text,
+            Err(msg) => {
+                eprintln!("Error: {msg}");
+                eprintln!("       Please create a syllabus file -> {}", FILENAME);
+                process::exit(1);
+            },
+        };
+
+        if syllabus.is_empty() {
+            eprintln!("Error: {} is empty", FILENAME);
+            Self::display_header_format_msg(HEADER_LINE);
+            process::exit(1);
+        }
+        else if syllabus.lines().next().unwrap() != HEADER_LINE {
+            eprintln!("Error: {} header line is formatted incorrectly", FILENAME);
+            Self::display_header_format_msg(HEADER_LINE);
+            process::exit(1);
+        }
+        //TODO: Add check for properly formatted syllabus entries (probably easier to handle this from struct)
+        else {
+            println!("{}", syllabus.lines().count());
+            for line in syllabus.lines() {
+                println!("line: {}", line);
+            }
+
+            //TODO: Instantiate new GradeCategory objects
+            let num_categories: usize = syllabus.lines().count() - 1;
+            return Syllabus {
+                num_categories: num_categories,
+                categories: Vec::with_capacity(num_categories),
+            };
+        }
+    }
+
+    fn display_header_format_msg (header_line: &str) {
+        eprintln!("       Use the following for the header line:");
+        eprintln!("           {}\n", header_line);
+        eprintln!("       All entries should follow this format.\n");
+    }
+}
+
+struct GradeCategory<'a> {
+    _name: &'a str,         //formerly category
+    _filename: &'a str,
+    _percentage: f32,    //formerly percent_grade
+    _size: u8,           //formerly num_elements
+    _max_points: u8,
+    _scores: Vec<f32>,
+    _total: f32,         //formerly grade_total
+    _dropped: u8,        //formerly num_dropped_grades
+}
+
+impl<'a> GradeCategory<'a> {
     fn _new () {}
     fn _calculate_total () {}
     fn _bubble_sort () {}
@@ -44,44 +95,5 @@ impl<'a> _GradeCategory<'a> {
 }
 
 fn main() {
-    let syllabus = import_syllabus();
-    println!("{}", syllabus.lines().count());
-    for line in syllabus.lines() {
-        println!("line: {}", line);
-    }
-    //TODO: Instantiate new GradeCategory objects
-}
-
-fn import_syllabus () -> String {
-    const FILENAME: &str = "syllabus.csv";
-    const HEADER_LINE: &str = "category,percent,size,filename,dropped";
-    let syllabus: String = match fs::read_to_string(FILENAME) {
-        Ok(text) => text,
-        Err(msg) => {
-            eprintln!("Error: {msg}");
-            eprintln!("       Please create a syllabus file -> {}", FILENAME);
-            process::exit(1);
-        },
-    };
-
-    if syllabus.is_empty() {
-        eprintln!("Error: {} is empty", FILENAME);
-        display_header_format_msg(HEADER_LINE);
-        process::exit(1);
-    }
-    else if syllabus.lines().next().unwrap() != HEADER_LINE {
-        eprintln!("Error: {} header line is formatted incorrectly", FILENAME);
-        display_header_format_msg(HEADER_LINE);
-        process::exit(1);
-    }
-    //TODO: Add check for properly formatted syllabus entries (probably easier to handle this from struct)
-    else {
-        return syllabus;
-    }
-}
-
-fn display_header_format_msg (header_line: &str) {
-    eprintln!("       Use the following for the header line:");
-    eprintln!("           {}\n", header_line);
-    eprintln!("       All entries should follow this format.\n");
+    let syllabus: Syllabus = Syllabus::new();
 }
