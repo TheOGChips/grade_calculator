@@ -33,16 +33,17 @@ impl<'a> Syllabus<'a> {
         }
         //TODO: Add check for properly formatted syllabus entries (probably easier to handle this from struct)
         else {
-            println!("{}", syllabus.lines().count());
-            for line in syllabus.lines() {
+            let num_categories: usize = syllabus.lines().count() - 1;
+            let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
+
+            for line in syllabus.lines().skip(1) {
+                //TODO: Parse each of the remaining lines and construct new GradeCategory objects
                 println!("line: {}", line);
             }
 
-            //TODO: Instantiate new GradeCategory objects
-            let num_categories: usize = syllabus.lines().count() - 1;
             return Syllabus {
                 num_categories: num_categories,
-                categories: Vec::with_capacity(num_categories),
+                categories: Vec::new(),
             };
         }
     }
