@@ -1,4 +1,7 @@
-use std::fs;
+use std::{
+    fs,
+    process,
+};
 
 struct _GradeCategory<'a> {
     name: &'a str,         //formerly category
@@ -41,6 +44,15 @@ impl<'a> _GradeCategory<'a> {
 }
 
 fn main() {
+    let syllabus = import_syllabus();
+    println!("{}", syllabus.lines().count());
+    for line in syllabus.lines() {
+        println!("line: {}", line);
+    }
+    //TODO: Instantiate new GradeCategory objects
+}
+
+fn import_syllabus () -> String {
     const FILENAME: &str = "syllabus.csv";
     const HEADER_LINE: &str = "category,percent,size,filename,dropped";
     let syllabus: String = match fs::read_to_string(FILENAME) {
@@ -48,24 +60,23 @@ fn main() {
         Err(msg) => {
             eprintln!("Error: {msg}");
             eprintln!("       Please create a syllabus file -> {}", FILENAME);
-            return;
+            process::exit(1);
         },
     };
 
     if syllabus.is_empty() {
         eprintln!("Error: {} is empty", FILENAME);
         display_header_format_msg(HEADER_LINE);
+        process::exit(1);
     }
     else if syllabus.lines().next().unwrap() != HEADER_LINE {
         eprintln!("Error: {} header line is formatted incorrectly", FILENAME);
         display_header_format_msg(HEADER_LINE);
+        process::exit(1);
     }
     //TODO: Add check for properly formatted syllabus entries (probably easier to handle this from struct)
     else {
-        println!("{}", syllabus.lines().count());
-        for line in syllabus.lines() {
-            println!("line: {}", line);
-        }
+        return syllabus;
     }
 }
 
