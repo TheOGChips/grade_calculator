@@ -1,6 +1,7 @@
 use std::{
     fs,
     process,
+    str::FromStr,
 };
 
 struct Syllabus<'a> {
@@ -9,42 +10,79 @@ struct Syllabus<'a> {
 }
 
 impl<'a> Syllabus<'a> {
+    const FILENAME: &str = "syllabus.csv";
+
     fn new () -> Self {
-        const FILENAME: &str = "syllabus.csv";
         const HEADER_LINE: &str = "category,percent,size,filename,dropped";
-        let syllabus: String = match fs::read_to_string(FILENAME) {
+        let syllabus: String = match fs::read_to_string(Self::FILENAME) {
             Ok(text) => text,
             Err(msg) => {
                 eprintln!("Error: {msg}");
-                eprintln!("       Please create a syllabus file -> {}", FILENAME);
+                eprintln!("       Please create a syllabus file -> {}", Self::FILENAME);
                 process::exit(1);
             },
         };
 
         if syllabus.is_empty() {
-            eprintln!("Error: {} is empty", FILENAME);
+            eprintln!("Error: {} is empty", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
-            process::exit(1);
         }
         else if syllabus.lines().next().unwrap() != HEADER_LINE {
-            eprintln!("Error: {} header line is formatted incorrectly", FILENAME);
+            eprintln!("Error: {} header line is formatted incorrectly", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
-            process::exit(1);
         }
-        //TODO: Add check for properly formatted syllabus entries (probably easier to handle this from struct)
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
             let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
+            let mut count: u8 = 0;
 
             for line in syllabus.lines().skip(1) {
-                //TODO: Parse each of the remaining lines and construct new GradeCategory objects
                 let mut tokens: std::str::Split<&str> = line.split(",");
-                let name: &str = match tokens.next() {
-                    Some(token) => token,
-                    None => panic!("Placeholder"),
-                };
+                count += 1;
+
+                /* NOTE: Unwrapping is okay here since I just need to check that the category
+                 *       name isn't empty, and None will never happen.
+                 */
+                let name: &str = tokens.next().unwrap();
+                if name.is_empty() {
+                    eprintln!("Error: No category name provided for syllabus entry on line {}", count);
+                    process::exit(1);
+                }
                 println!("name: {}", name);
+
+                let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
+                println!("percent: {}", percent);
+
+                let size: u8 = Self::parse_token::<u8>(tokens.next(), name, "size");
+                println!("size: {}", size);
+
+                let filename: &str = match tokens.next() {
+                    Some("") => {
+                        eprintln!("Error: No filename provided for syllabus entry '{}'", name);
+                        Self::display_entry_parse_err_msg(name);
+                    },
+                    Some(token) => token,
+                    None => {
+                        eprintln!("Error: No filename found for syllabus entry '{}'", name);
+                        Self::display_entry_parse_err_msg(name);
+                    },
+                };
+                println!("filename: {}", filename);
+
+                let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
+                println!("dropped: {}", dropped);
             }
+
+            //TODO: Construct new GradeCategory objects
+            /*      if file(s) don't yet exist
+             *          then create and populate them with placeholder -1's
+             *      else if sizes and line counts don't match
+             *          then if size is smaller
+             *                  then read in grades up to size
+             *               else read in all grades and append -1's up to size
+             *          overwrite grades to the same file
+             *      else read grades from files into a vector
+             */
 
             return Syllabus {
                 num_categories: num_categories,
@@ -53,10 +91,36 @@ impl<'a> Syllabus<'a> {
         }
     }
 
-    fn display_header_format_msg (header_line: &str) {
+    fn display_header_format_msg (header_line: &str) -> ! {
         eprintln!("       Use the following for the header line:");
         eprintln!("           {}\n", header_line);
         eprintln!("       All entries should follow this format.\n");
+        process::exit(1);
+    }
+
+    fn display_entry_parse_err_msg (name: &str) -> ! {
+        eprintln!("       Check that '{}' entry is formatted correctly in {}", name,
+                  Self::FILENAME);
+        process::exit(1);
+    }
+
+    fn parse_token<T> (token: Option<&str>, name: &str, column: &str) -> T
+    where T: FromStr,
+          <T as FromStr>::Err: std::fmt::Display {
+        return match token {
+            Some(token) => match token.parse::<T>() {
+                Ok(token) => token,
+                Err(msg) => {
+                    eprintln!("Encountered error while reading in {} for syllabus entry '{}': \
+                               {}", column, name, msg);
+                    Self::display_entry_parse_err_msg(name);
+                },
+            },
+            None => {
+                eprintln!("Error: Unable to read category entry '{}'.", name);
+                Self::display_entry_parse_err_msg(name);
+            },
+        };
     }
 }
 
