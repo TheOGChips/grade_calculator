@@ -31,6 +31,11 @@ impl<'a> Syllabus<'a> {
             eprintln!("Error: {} header line is formatted incorrectly", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
         }
+        else if syllabus.lines().count() == 1 {
+            eprintln!("Error: {} has no entries after header line.", Self::FILENAME);
+            eprintln!("       At least one entry is required.");
+            process::exit(1);
+        }
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
             let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
