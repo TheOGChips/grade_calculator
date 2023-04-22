@@ -10,7 +10,7 @@ struct Syllabus<'a> {
 }
 
 impl<'a> Syllabus<'a> {
-    const FILENAME: &str = "syllabus.csv";
+    const FILENAME: &'a str = "syllabus.csv";
 
     fn new () -> Self {
         const HEADER_LINE: &str = "category,percent,size,filename,dropped";
@@ -39,43 +39,9 @@ impl<'a> Syllabus<'a> {
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
             let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
-            let mut count: u8 = 0;
 
             for line in syllabus.lines().skip(1) {
-                let mut tokens: std::str::Split<&str> = line.split(",");
-                count += 1;
-
-                /* NOTE: Unwrapping is okay here since I just need to check that the category
-                 *       name isn't empty, and None will never happen.
-                 */
-                let name: &str = tokens.next().unwrap();
-                if name.is_empty() {
-                    eprintln!("Error: No category name provided for syllabus entry on line {}", count);
-                    process::exit(1);
-                }
-                println!("name: {}", name);
-
-                let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
-                println!("percent: {}", percent);
-
-                let size: u8 = Self::parse_token::<u8>(tokens.next(), name, "size");
-                println!("size: {}", size);
-
-                let filename: &str = match tokens.next() {
-                    Some("") => {
-                        eprintln!("Error: No filename provided for syllabus entry '{}'", name);
-                        Self::display_entry_parse_err_msg(name);
-                    },
-                    Some(token) => token,
-                    None => {
-                        eprintln!("Error: No filename found for syllabus entry '{}'", name);
-                        Self::display_entry_parse_err_msg(name);
-                    },
-                };
-                println!("filename: {}", filename);
-
-                let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
-                println!("dropped: {}", dropped);
+                let (name, percent, size, filename, dropped): (String, f32, u8, String, u8) = Self::parse_line(line);
             }
 
             //TODO: Construct new GradeCategory objects
@@ -107,6 +73,53 @@ impl<'a> Syllabus<'a> {
         eprintln!("       Check that '{}' entry is formatted correctly in {}", name,
                   Self::FILENAME);
         process::exit(1);
+    }
+    
+    fn parse_line (line: &str) -> (String, f32, u8, String, u8) {
+        let mut tokens: std::str::Split<&str> = line.split(",");
+        /* NOTE: Decided to use static here instead of a mutable borrow because count isn't used
+         *       anywhere outside this function
+         */
+        static mut COUNT: u8 = 1;
+        unsafe {
+            COUNT += 1;
+        }
+
+        /* NOTE: Unwrapping is okay here since I just need to check that the category
+            *       name isn't empty, and None will never happen.
+            */
+        let name: &str = tokens.next().unwrap();
+        if name.is_empty() {
+            unsafe {
+                eprintln!("Error: No category name provided for syllabus entry on line {}", COUNT);
+            }
+            process::exit(1);
+        }
+        println!("name: {}", name);
+
+        let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
+        println!("percent: {}", percent);
+
+        let size: u8 = Self::parse_token::<u8>(tokens.next(), name, "size");
+        println!("size: {}", size);
+
+        let filename: &str = match tokens.next() {
+            Some("") => {
+                eprintln!("Error: No filename provided for syllabus entry '{}'", name);
+                Self::display_entry_parse_err_msg(name);
+            },
+            Some(token) => token,
+            None => {
+                eprintln!("Error: No filename found for syllabus entry '{}'", name);
+                Self::display_entry_parse_err_msg(name);
+            },
+        };
+        println!("filename: {}", filename);
+
+        let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
+        println!("dropped: {}", dropped);
+        
+        return (name.to_string(), percent, size, filename.to_string(), dropped);
     }
 
     fn parse_token<T> (token: Option<&str>, name: &str, column: &str) -> T
