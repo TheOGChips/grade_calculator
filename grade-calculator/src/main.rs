@@ -4,12 +4,12 @@ use std::{
     str::FromStr,
 };
 
-struct Syllabus<'a> {
-    categories: Vec<GradeCategory<'a>>,
+struct Syllabus {
+    categories: Vec<GradeCategory>,
     num_categories: usize,
 }
 
-impl<'a> Syllabus<'a> {
+impl<'a> Syllabus {
     const FILENAME: &'a str = "syllabus.csv";
 
     fn new () -> Self {
@@ -41,7 +41,9 @@ impl<'a> Syllabus<'a> {
             let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
 
             for line in syllabus.lines().skip(1) {
-                let (name, percent, size, filename, dropped): (String, f32, u8, String, u8) = Self::parse_line(line);
+                /*let (name, percent, size, filename, dropped): (String, f32, u8, String, u8) = Self::parse_line(line);
+                let category: GradeCategory = GradeCategory::new(name, percent, size, filename, dropped);*/
+                let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
             }
 
             //TODO: Construct new GradeCategory objects
@@ -142,23 +144,59 @@ impl<'a> Syllabus<'a> {
     }
 }
 
-struct GradeCategory<'a> {
-    _name: &'a str,         //formerly category
-    _filename: &'a str,
-    _percentage: f32,    //formerly percent_grade
-    _size: u8,           //formerly num_elements
-    _max_points: u8,
-    _scores: Vec<f32>,
-    _total: f32,         //formerly grade_total
-    _dropped: u8,        //formerly num_dropped_grades
+struct GradeCategory {
+    name: String,         //formerly category
+    filename: String,
+    percentage: f32,    //formerly percent_grade
+    size: u8,           //formerly num_elements
+    max_points: u32,
+    scores: Vec<f32>,
+    total: f32,         //formerly grade_total
+    dropped: u8,        //formerly num_dropped_grades
 }
 
-impl<'a> GradeCategory<'a> {
-    fn _new () {}
+impl<'a> GradeCategory {
+    fn new ((name, percent, size, filename, dropped): (String, f32, u8, String, u8)) -> GradeCategory {
+        let mut category: GradeCategory = GradeCategory {
+            name: name,
+            filename: filename,
+            percentage: percent,
+            size: size,
+            max_points: (size - dropped) as u32 * 100,
+            scores: Vec::new(), //TODO: Set scores
+            total: 0.0,         //TODO: Calculate total
+            dropped: dropped,
+        };
+        category.import_scores();
+        return category;
+    }
+    
     fn _calculate_total () {}
     fn _bubble_sort () {}
-    fn _import () {}            //formerly read_scores_from_file(string)
-    fn _export () {}            //formerly write_scores_to_file(string)
+    
+    fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
+        match fs::read_to_string(&self.filename) {
+            Ok(text) => {
+                //TODO: convert scores to Vec
+                //TODO: sort Vec if there are dropped scores
+                //TODO: Assign sorted Vec to self.scores
+            },
+            Err(_) => {
+                self.scores = vec![-1.0; self.size as usize];
+                self.export();
+            }
+        }
+    }
+    
+    fn export (&self) {              //formerly write_scores_to_file(string)
+        let scores: String = vec![self.scores.iter().map(|score| score.to_string()).collect::<String>()].join("");
+        //let scores: String = scores.join("\n");
+        println!("scores: {}", scores);
+        /*for score in scores {
+            fs::write(&self.filename, format!("{}\n", score));
+        }*/
+    }
+    
     fn _enter_new_score () {}
 
     fn _set_name () {}          //formerly set_category(string)
@@ -167,7 +205,6 @@ impl<'a> GradeCategory<'a> {
     fn _set_size () {}          //formerly set_num_elements(const unsigned int, string)
     fn _line_count () {}
     fn _overwrite_file () {}
-    fn _set_max_points () {}
     fn _set_scores () {}
     fn _set_total () {}         //formerly set_grade_total()
     fn _set_dropped () {}       //formerly set_num_dropped_grades(int)
@@ -175,7 +212,6 @@ impl<'a> GradeCategory<'a> {
     fn _get_category () {}      //formerly get_category_name() const
     fn _get_filename () {}
     fn _get_percentage () {}    //formerly get_percentage() const
-    fn _get_size () {}          //formerly get_num_elements() const
     fn _get_max_points () {}
     fn _get_score () {}
     fn _get_total () {}         //formerly get_grade_total() const
