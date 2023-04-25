@@ -173,8 +173,7 @@ impl<'a> GradeCategory {
     }
     
     fn _calculate_total () {}
-    fn _bubble_sort () {}
-    
+
     fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
         match fs::read_to_string(&self.filename) {
             Ok(text) => {
@@ -188,19 +187,19 @@ impl<'a> GradeCategory {
                         }
                     });
                 }
-                println!("line count: {:?}", text.lines().count());
+
+                if self.dropped > 0 {
+                    scores.sort_by(|a, b| a.partial_cmp(b).unwrap().reverse());
+                }
 
                 if usize::from(self.size) != text.lines().count() {
                     scores.resize(self.size as usize, -1.0);
                     self.scores = scores;
                     self.export();
-                    println!("scores: {:?}", self.scores);
                 }
                 else {
                     self.scores = scores;
                 }
-                //TODO: sort Vec if there are dropped scores
-
             },
             Err(_) => {
                 self.scores = vec![-1.0; self.size as usize];
@@ -225,7 +224,7 @@ impl<'a> GradeCategory {
             writeln!(buffer, "{}", score);
         }
     }
-    
+
     fn _enter_new_score () {}
 
     fn _set_name () {}          //formerly set_category(string)
