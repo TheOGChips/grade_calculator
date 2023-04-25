@@ -164,7 +164,7 @@ impl<'a> GradeCategory {
             percentage: percent,
             size: size,
             max_points: (size - dropped) as u32 * 100,
-            scores: Vec::new(), //TODO: Set scores
+            scores: Vec::new(),
             total: 0.0,         //TODO: Calculate total
             dropped: dropped,
         };
@@ -178,9 +178,20 @@ impl<'a> GradeCategory {
     fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
         match fs::read_to_string(&self.filename) {
             Ok(text) => {
-                //TODO: convert scores to Vec
+                let mut scores: Vec<f32> = Vec::new();
+                for line in text.lines() {
+                    scores.push(match line.parse() {
+                        Ok(num) => num,
+                        Err(msg) => {
+                            eprintln!("Error: '{msg}' while reading in scores from {}", self.filename);
+                            process::exit(1);
+                        }
+                    });
+                }
+                println!("scores: {:?}", scores);
+                //TODO: overwrite file if line count doesn't match size
                 //TODO: sort Vec if there are dropped scores
-                //TODO: Assign sorted Vec to self.scores
+                self.scores = scores;
             },
             Err(_) => {
                 self.scores = vec![-1.0; self.size as usize];
