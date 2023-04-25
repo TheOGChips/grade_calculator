@@ -2,6 +2,7 @@ use std::{
     fs,
     process,
     str::FromStr,
+    io::Write,
 };
 
 struct Syllabus {
@@ -189,12 +190,20 @@ impl<'a> GradeCategory {
     }
     
     fn export (&self) {              //formerly write_scores_to_file(string)
-        let scores: String = vec![self.scores.iter().map(|score| score.to_string()).collect::<String>()].join("");
-        //let scores: String = scores.join("\n");
-        println!("scores: {}", scores);
-        /*for score in scores {
-            fs::write(&self.filename, format!("{}\n", score));
-        }*/
+        let scores: Vec<String> = self.scores.iter()
+            .map(|score| score.to_string())
+            .collect();
+        let mut buffer = match fs::File::create(&self.filename) {
+            Ok(fp) => fp,
+            Err(msg) => {
+                eprintln!("Error: '{}' occured while trying to create {}", msg, self.filename);
+                process::exit(1);
+            }
+        };
+
+        for score in scores {
+            writeln!(buffer, "{}", score);
+        }
     }
     
     fn _enter_new_score () {}
