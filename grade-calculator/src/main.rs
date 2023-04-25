@@ -78,7 +78,7 @@ impl<'a> Syllabus {
         process::exit(1);
     }
     
-    fn parse_line (line: &str) -> (String, f32, u8, String, u8) {
+    fn parse_line (line: &str) -> (String, f32, usize, String, u8) {
         let mut tokens: std::str::Split<&str> = line.split(",");
         /* NOTE: Decided to use static here instead of a mutable borrow because count isn't used
          *       anywhere outside this function
@@ -103,7 +103,7 @@ impl<'a> Syllabus {
         let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
         println!("percent: {}", percent);
 
-        let size: u8 = Self::parse_token::<u8>(tokens.next(), name, "size");
+        let size: usize = Self::parse_token::<usize>(tokens.next(), name, "size");
         println!("size: {}", size);
 
         let filename: &str = match tokens.next() {
@@ -149,7 +149,7 @@ struct GradeCategory {
     name: String,         //formerly category
     filename: String,
     percentage: f32,    //formerly percent_grade
-    size: u8,           //formerly num_elements
+    size: usize,           //formerly num_elements
     max_points: u32,
     scores: Vec<f32>,
     total: f32,         //formerly grade_total
@@ -157,13 +157,13 @@ struct GradeCategory {
 }
 
 impl<'a> GradeCategory {
-    fn new ((name, percent, size, filename, dropped): (String, f32, u8, String, u8)) -> GradeCategory {
+    fn new ((name, percent, size, filename, dropped): (String, f32, usize, String, u8)) -> GradeCategory {
         let mut category: GradeCategory = GradeCategory {
             name: name,
             filename: filename,
             percentage: percent,
             size: size,
-            max_points: (size - dropped) as u32 * 100,
+            max_points: (size - dropped as usize) as u32 * 100,
             scores: Vec::new(),
             total: 0.0,         //TODO: Calculate total
             dropped: dropped,
@@ -192,7 +192,7 @@ impl<'a> GradeCategory {
                     scores.sort_by(|a, b| a.partial_cmp(b).unwrap().reverse());
                 }
 
-                if usize::from(self.size) != text.lines().count() {
+                if self.size != text.lines().count() {
                     scores.resize(self.size as usize, -1.0);
                     self.scores = scores;
                     self.export();
