@@ -188,10 +188,19 @@ impl<'a> GradeCategory {
                         }
                     });
                 }
-                println!("scores: {:?}", scores);
-                //TODO: overwrite file if line count doesn't match size
+                println!("line count: {:?}", text.lines().count());
+
+                if usize::from(self.size) != text.lines().count() {
+                    scores.resize(self.size as usize, -1.0);
+                    self.scores = scores;
+                    self.export();
+                    println!("scores: {:?}", self.scores);
+                }
+                else {
+                    self.scores = scores;
+                }
                 //TODO: sort Vec if there are dropped scores
-                self.scores = scores;
+
             },
             Err(_) => {
                 self.scores = vec![-1.0; self.size as usize];
@@ -224,7 +233,6 @@ impl<'a> GradeCategory {
     fn _set_percentage () {}    //formerly set_percent_grade(float)
     fn _set_size () {}          //formerly set_num_elements(const unsigned int, string)
     fn _line_count () {}
-    fn _overwrite_file () {}
     fn _set_scores () {}
     fn _set_total () {}         //formerly set_grade_total()
     fn _set_dropped () {}       //formerly set_num_dropped_grades(int)
