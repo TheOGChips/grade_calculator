@@ -18,8 +18,10 @@ fn main() {
     let mut selection: u8 = 0;
     while selection != num_selections {
         println!("\n------ MENU ------");
-        for (category, cat_no) in zip(syllabus.categories(), 1..=syllabus.num_categories()) {
-            println!("{}: {}", cat_no, category.name());
+        //for (category, cat_no) in zip(syllabus.categories(), 1..=syllabus.num_categories()) {
+        for category in syllabus.categories() {
+            //println!("{}: {}", cat_no, category.name());
+            println!("{}: {}", category.0, category.1.name());
         }
         println!("{}: Display final grade", num_selections - 1);
         println!("{}: Exit", num_selections);
@@ -38,14 +40,10 @@ fn main() {
         else {
             //TODO: Look into using a HashMap for this
             if selection >= 1 && selection <= syllabus.num_categories() {
-                for (category, cat_no) in
-                    zip(syllabus.categories(), 1..=syllabus.num_categories()) {
-                    if selection == cat_no {
-                        print!("\nEnter new grade for {}: ", category.name());
-                        let grade: f32 = read!();   //TODO: Properly error handle this later
-                        println!("{}", grade);
-                    }
-                }
+                print!("\nEnter new grade for {}: ",
+                       syllabus.categories().get(&usize::from(selection)).unwrap().name());
+                let grade: f32 = read!();   //TODO: Properly error handle this later
+                println!("{}", grade);
             }
             selection = num_selections;
         }

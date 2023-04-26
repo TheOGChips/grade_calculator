@@ -3,11 +3,15 @@ use std::{
     process,
     str::FromStr,
     io::Write,
+    collections::{  //NOTE: Using BTreeMap to have a guaranteed iteration order in the menu
+        BTreeMap,
+        btree_map::Iter,
+    },
+    iter::zip,
 };
-use core::slice::Iter;
 
 pub struct Syllabus {
-    categories: Vec<GradeCategory>,
+    categories: BTreeMap<usize, GradeCategory>,
     num_categories: usize,
 }
 
@@ -40,25 +44,12 @@ impl<'a> Syllabus {
         }
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
-            let mut categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
+            let mut categories: BTreeMap<usize, GradeCategory> = BTreeMap::new();
 
-            for line in syllabus.lines().skip(1) {
-                /*let (name, percent, size, filename, dropped): (String, f32, u8, String, u8) = Self::parse_line(line);
-                let category: GradeCategory = GradeCategory::new(name, percent, size, filename, dropped);*/
+            for (line, cat_no) in zip(syllabus.lines().skip(1), 1..=num_categories) {
                 let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
-                categories.push(category);
+                categories.insert(cat_no, category);
             }
-
-            //TODO: Construct new GradeCategory objects
-            /*      if file(s) don't yet exist
-             *          then create and populate them with placeholder -1's
-             *      else if sizes and line counts don't match
-             *          then if size is smaller
-             *                  then read in grades up to size
-             *               else read in all grades and append -1's up to size
-             *          overwrite grades to the same file
-             *      else read grades from files into a vector
-             */
 
             return Syllabus {
                 num_categories: num_categories,
@@ -133,8 +124,9 @@ impl<'a> Syllabus {
         };
     }
 
-    pub fn categories (&self) -> Iter<GradeCategory> {
-        return self.categories.iter();
+    //pub fn categories (&self) -> Iter<usize, GradeCategory> {
+    pub fn categories (&self) -> &BTreeMap<usize, GradeCategory> {
+        return &self.categories;
     }
 
     pub fn num_categories (&self) -> u8 {
