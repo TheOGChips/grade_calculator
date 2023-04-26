@@ -169,10 +169,9 @@ impl<'a> GradeCategory {
             dropped: dropped,
         };
         category.import_scores();
+        category.calculate_total();
         return category;
     }
-    
-    fn _calculate_total () {}
 
     fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
         match fs::read_to_string(&self.filename) {
@@ -191,7 +190,6 @@ impl<'a> GradeCategory {
                 if self.dropped > 0 {
                     scores.sort_by(|a, b| b.partial_cmp(a).unwrap());
                 }
-                println!("scores: {:?}", scores);
 
                 if self.size != text.lines().count() {
                     scores.resize(self.size as usize, -1.0);
@@ -224,6 +222,27 @@ impl<'a> GradeCategory {
         for score in scores {
             writeln!(buffer, "{}", score);
         }
+    }
+
+    fn calculate_total (&mut self) {
+        //TODO: Sort scores before calculating total
+        println!("scores: {:?}", self.scores);
+        self.total = self.scores.iter()
+            .map(|&score|
+                if score < 0.0 {
+                    return 0.0;
+                }
+                else {
+                    return score;
+                })
+            .reduce(|acc, val| acc + val).unwrap();
+            /* NOTE: The only way a None value might happen would be if I removed all the scores
+             *       from a file manually, but because of the way I have ensured that the scores
+             *       files exist and that sizes are always consistent, this will never happen;
+             *       unwrapping is safe here.
+             */
+        self.total /= self.max_points as f32;
+        self.total *= self.percentage;
     }
 
     fn _enter_new_score () {}
