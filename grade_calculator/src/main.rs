@@ -23,6 +23,12 @@ fn main() {
         }
         println!("{}: Display final grade", num_selections - 1);
         println!("{}: Exit", num_selections);
+        print!("\nWhich category would you like to add a grade to? ");
+        let input: String = read!();
+        selection = match input.parse() {
+            Ok(num) => num,
+            Err(_) => 0,
+        };
         selection = num_selections;
     }
     /*print!("Type something and hit enter: ");
