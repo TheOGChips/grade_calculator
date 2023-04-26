@@ -189,8 +189,9 @@ impl<'a> GradeCategory {
                 }
 
                 if self.dropped > 0 {
-                    scores.sort_by(|a, b| a.partial_cmp(b).unwrap().reverse());
+                    scores.sort_by(|a, b| b.partial_cmp(a).unwrap());
                 }
+                println!("scores: {:?}", scores);
 
                 if self.size != text.lines().count() {
                     scores.resize(self.size as usize, -1.0);
