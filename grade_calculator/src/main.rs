@@ -11,7 +11,7 @@ use std::{
 use text_io::read;
 
 fn main() {
-    //TODO: Clear screen at the start of the program
+    clear_screen();
     let syllabus: Syllabus = Syllabus::new();
     //TODO: Also need to calculate total course grade beforehand, maybe?
     //TODO: Start working on the menu
@@ -39,13 +39,16 @@ fn main() {
             println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
         }
         else {
-            //TODO: Look into using a HashMap for this
             if selection >= 1 && selection <= syllabus.num_categories() {
                 print!("\nEnter new grade for {}: ",
                        syllabus.categories().get(&usize::from(selection)).unwrap().name());
-                let grade: f32 = read!();   //TODO: Properly error handle this later
-                clear_screen();
+                let grade: f32 = read!();   //TODO: Properly error handle this
+                //TODO: Add the new grade to the GradeCategory's scores Vec
             }
+            else if selection == num_selections - 1 {
+                //TODO: Calculate and print out the total score for the course
+            }
+            clear_screen(); //TODO: Should I keep the screen clearing after printing out the total grade?
         }
     }
     /*print!("Type something and hit enter: ");
