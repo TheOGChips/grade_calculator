@@ -42,22 +42,34 @@ fn main() {
         }
         else {
             if selection >= 1 && selection <= syllabus.num_categories() {
-                print!("\nEnter new grade for {}: ",
-                       syllabus.categories().get(&usize::from(selection)).unwrap().name());
-                //TODO: Add a check for the category being full (all grades being entered)
-                let grade: String = read!();
-                match grade.parse::<f32>() {
-                    Ok(num) => if num < 0.0 || num > 120.0 {
-                        println!("\nError: Grade value is outside valid range.");
-                        sleep(Duration::from_secs(2));
+                if !syllabus.categories()
+                    .get(&usize::from(selection))
+                    .unwrap()
+                    .scores()
+                    .contains(&-1.0) {
+                        //TODO: Change this message to use the syllabus and text file variables
+                        println!("\nError: Cannot add anymore grades to this category!");
+                        println!("       Edit the syllabus file if you wish to add more grades");
+                        println!("       or edit the text file manually.");
+                        sleep(Duration::from_secs(7));
+                }
+                else {
+                    print!("\nEnter new grade for {}: ",
+                           syllabus.categories().get(&usize::from(selection)).unwrap().name());
+                    let grade: String = read!();
+                    match grade.parse::<f32>() {
+                        Ok(num) => if num < 0.0 || num > 120.0 {
+                            println!("\nError: Grade value is outside valid range.");
+                            sleep(Duration::from_secs(2));
+                        }
+                        else {
+                            todo!(); //TODO: Add the new grade to the GradeCategory's scores Vec
+                        },
+                        Err(msg) => {
+                            println!("\nError: {}", msg);
+                            sleep(Duration::from_secs(2));
+                        },
                     }
-                    else {
-                        todo!();    //TODO: Add the new grade to the GradeCategory's scores Vec
-                    },
-                    Err(msg) => {
-                        println!("\nError: {}", msg);
-                        sleep(Duration::from_secs(2));
-                    },
                 }
             }
             else if selection == num_selections - 1 {

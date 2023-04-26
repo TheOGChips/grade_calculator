@@ -248,6 +248,10 @@ impl<'a> GradeCategory {
         return &self.name;
     }
 
+    pub fn scores (&self) -> &Vec<f32> {
+        return &self.scores;
+    }
+
     fn _get_filename () {}
     fn _get_percentage () {}    //formerly get_percentage() const
     fn _get_max_points () {}
