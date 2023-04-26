@@ -7,8 +7,8 @@ use std::{
     },
     process::Command,
     iter::zip,
-    thread,
-    time,
+    thread::sleep,
+    time::Duration,
 };
 use text_io::read;
 
@@ -38,21 +38,27 @@ fn main() {
         if selection == 0 || selection > num_selections {
             //NOTE: For some reason, this doesn't print out when using eprintln.
             println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
-            thread::sleep(time::Duration::from_secs(3));
+            sleep(Duration::from_secs(3));
         }
         else {
             if selection >= 1 && selection <= syllabus.num_categories() {
                 print!("\nEnter new grade for {}: ",
                        syllabus.categories().get(&usize::from(selection)).unwrap().name());
-                let grade: String = read!();   //TODO: Properly error handle this
+                //TODO: Add a check for the category being full (all grades being entered)
+                let grade: String = read!();
                 match grade.parse::<f32>() {
-                    Ok(num) => todo!(),
+                    Ok(num) => if num < 0.0 || num > 120.0 {
+                        println!("\nError: Grade value is outside valid range.");
+                        sleep(Duration::from_secs(2));
+                    }
+                    else {
+                        todo!();    //TODO: Add the new grade to the GradeCategory's scores Vec
+                    },
                     Err(msg) => {
                         println!("\nError: {}", msg);
-                        thread::sleep(time::Duration::from_secs(2));
+                        sleep(Duration::from_secs(2));
                     },
                 }
-                //TODO: Add the new grade to the GradeCategory's scores Vec
             }
             else if selection == num_selections - 1 {
                 //TODO: Calculate and print out the total score for the course
