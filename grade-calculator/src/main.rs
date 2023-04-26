@@ -176,9 +176,8 @@ impl<'a> GradeCategory {
     fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
         match fs::read_to_string(&self.filename) {
             Ok(text) => {
-                let mut scores: Vec<f32> = Vec::new();
                 for line in text.lines() {
-                    scores.push(match line.parse() {
+                    self.scores.push(match line.parse() {
                         Ok(num) => num,
                         Err(msg) => {
                             eprintln!("Error: '{msg}' while reading in scores from {}", self.filename);
@@ -186,8 +185,6 @@ impl<'a> GradeCategory {
                         }
                     });
                 }
-
-                self.scores = scores;
 
                 if self.dropped > 0 {
                     self.sort_scores();
