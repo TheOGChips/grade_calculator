@@ -29,7 +29,16 @@ fn main() {
             Ok(num) => num,
             Err(_) => 0,
         };
-        selection = num_selections;
+
+        if selection == 0 || selection > num_selections {
+            clear_screen();
+            //NOTE: For some reason, this doesn't print out when using eprintln.
+            println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
+        }
+        else {
+            println!();
+            selection = num_selections;
+        }
     }
     /*print!("Type something and hit enter: ");
     stdout().flush().unwrap();
