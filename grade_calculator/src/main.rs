@@ -11,6 +11,7 @@ use std::{
 use text_io::read;
 
 fn main() {
+    //TODO: Clear screen at the start of the program
     let syllabus: Syllabus = Syllabus::new();
     //TODO: Also need to calculate total course grade beforehand, maybe?
     //TODO: Start working on the menu
@@ -43,9 +44,8 @@ fn main() {
                 print!("\nEnter new grade for {}: ",
                        syllabus.categories().get(&usize::from(selection)).unwrap().name());
                 let grade: f32 = read!();   //TODO: Properly error handle this later
-                println!("{}", grade);
+                clear_screen();
             }
-            selection = num_selections;
         }
     }
     /*print!("Type something and hit enter: ");
