@@ -14,7 +14,7 @@ impl<'a> Syllabus {
     const FILENAME: &'a str = "syllabus.csv";
 
     pub fn new () -> Self {
-        const HEADER_LINE: &str = "category,percent,size,filename,dropped";
+        const HEADER_LINE: &str = "category,percent,size,dropped";
         let syllabus: String = match fs::read_to_string(Self::FILENAME) {
             Ok(text) => text,
             Err(msg) => {
@@ -78,7 +78,7 @@ impl<'a> Syllabus {
         process::exit(1);
     }
 
-    fn parse_line (line: &str) -> (String, f32, usize, String, u8) {
+    fn parse_line (line: &str) -> (String, f32, usize,  u8) {
         let mut tokens: std::str::Split<&str> = line.split(",");
         /* NOTE: Decided to use static here instead of a mutable borrow because count isn't used
          *       anywhere outside this function
@@ -106,23 +106,10 @@ impl<'a> Syllabus {
         let size: usize = Self::parse_token::<usize>(tokens.next(), name, "size");
         println!("size: {}", size);
 
-        let filename: &str = match tokens.next() {
-            Some("") => {
-                eprintln!("Error: No filename provided for syllabus entry '{}'", name);
-                Self::display_entry_parse_err_msg(name);
-            },
-            Some(token) => token,
-            None => {
-                eprintln!("Error: No filename found for syllabus entry '{}'", name);
-                Self::display_entry_parse_err_msg(name);
-            },
-        };
-        println!("filename: {}", filename);
-
         let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
         println!("dropped: {}", dropped);
 
-        return (name.to_string(), percent, size, filename.to_string(), dropped);
+        return (name.to_string(), percent, size, dropped);
     }
 
     fn parse_token<T> (token: Option<&str>, name: &str, column: &str) -> T
@@ -157,11 +144,10 @@ struct GradeCategory {
 }
 
 impl<'a> GradeCategory {
-    //TODO: It would be simpler if the filename were to be generated from the GradeCategory name itself instead of the user having to manually add the filename in the syllabus file.
-    fn new ((name, percent, size, filename, dropped): (String, f32, usize, String, u8)) -> GradeCategory {
+    fn new ((name, percent, size, dropped): (String, f32, usize, u8)) -> GradeCategory {
         let mut category: GradeCategory = GradeCategory {
+            filename: format!("{}.txt", name),
             name: name,
-            filename: filename,
             percentage: percent,
             size: size,
             max_points: (size - dropped as usize) as u32 * 100,
