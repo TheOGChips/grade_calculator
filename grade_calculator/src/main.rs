@@ -6,13 +6,26 @@ use std::{
         Write,
     },
     process::Command,
+    iter::zip,
 };
 use text_io::read;
 
 fn main() {
     let syllabus: Syllabus = Syllabus::new();
+    //TODO: Also need to calculate total course grade beforehand, maybe?
     //TODO: Start working on the menu
-    print!("Type something and hit enter: ");
+    let num_selections: u8 = syllabus.num_categories() + 2;
+    let mut selection: u8 = 0;
+    while selection != num_selections {
+        println!("\n------ MENU ------");
+        for (category, cat_no) in zip(syllabus.categories(), 1..=syllabus.num_categories()) {
+            println!("{}: {}", cat_no, category.name());
+        }
+        println!("{}: Display final grade", num_selections - 1);
+        println!("{}: Exit", num_selections);
+        selection = num_selections;
+    }
+    /*print!("Type something and hit enter: ");
     stdout().flush().unwrap();
     let mut input: String = read!();
     println!("You entered: {}", input);
@@ -21,6 +34,11 @@ fn main() {
     print!("Type something else: ");
     input = read!();
     println!("You entered: {}", input);
+    let num: String = read!();
+    match num.parse::<u8>() {
+        Ok(n) => println!("num: {}", n),
+        Err(msg) => eprintln!("Error: {}", msg),
+    };*/
 }
 
 //NOTE: Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed

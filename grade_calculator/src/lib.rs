@@ -4,6 +4,7 @@ use std::{
     str::FromStr,
     io::Write,
 };
+use core::slice::Iter;
 
 pub struct Syllabus {
     categories: Vec<GradeCategory>,
@@ -39,12 +40,13 @@ impl<'a> Syllabus {
         }
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
-            let categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
+            let mut categories: Vec<GradeCategory> = Vec::with_capacity(num_categories);
 
             for line in syllabus.lines().skip(1) {
                 /*let (name, percent, size, filename, dropped): (String, f32, u8, String, u8) = Self::parse_line(line);
                 let category: GradeCategory = GradeCategory::new(name, percent, size, filename, dropped);*/
                 let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
+                categories.push(category);
             }
 
             //TODO: Construct new GradeCategory objects
@@ -60,7 +62,7 @@ impl<'a> Syllabus {
 
             return Syllabus {
                 num_categories: num_categories,
-                categories: Vec::new(),
+                categories: categories,
             };
         }
     }
@@ -98,16 +100,16 @@ impl<'a> Syllabus {
             }
             process::exit(1);
         }
-        println!("name: {}", name);
+        //println!("name: {}", name);
 
         let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
-        println!("percent: {}", percent);
+        //println!("percent: {}", percent);
 
         let size: usize = Self::parse_token::<usize>(tokens.next(), name, "size");
-        println!("size: {}", size);
+        //println!("size: {}", size);
 
         let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
-        println!("dropped: {}", dropped);
+        //println!("dropped: {}", dropped);
 
         return (name.to_string(), percent, size, dropped);
     }
@@ -130,9 +132,18 @@ impl<'a> Syllabus {
             },
         };
     }
+
+    pub fn categories (&self) -> Iter<GradeCategory> {
+        return self.categories.iter();
+    }
+
+    pub fn num_categories (&self) -> u8 {
+        return self.num_categories as u8;
+    }
 }
 
-struct GradeCategory {
+#[derive(Debug)]
+pub struct GradeCategory {
     name: String,         //formerly category
     filename: String,
     percentage: f32,    //formerly percent_grade
@@ -241,7 +252,10 @@ impl<'a> GradeCategory {
     //fn _set_total () {}         //formerly set_grade_total()
     //fn _set_dropped () {}       //formerly set_num_dropped_grades(int)
 
-    fn _get_category () {}      //formerly get_category_name() const
+    pub fn name (&self) -> &str {      //formerly get_category_name() const
+        return &self.name;
+    }
+
     fn _get_filename () {}
     fn _get_percentage () {}    //formerly get_percentage() const
     fn _get_max_points () {}
