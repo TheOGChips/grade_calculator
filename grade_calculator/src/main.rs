@@ -36,7 +36,17 @@ fn main() {
             println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
         }
         else {
-            println!();
+            //TODO: Look into using a HashMap for this
+            if selection >= 1 && selection <= syllabus.num_categories() {
+                for (category, cat_no) in
+                    zip(syllabus.categories(), 1..=syllabus.num_categories()) {
+                    if selection == cat_no {
+                        print!("\nEnter new grade for {}: ", category.name());
+                        let grade: f32 = read!();   //TODO: Properly error handle this later
+                        println!("{}", grade);
+                    }
+                }
+            }
             selection = num_selections;
         }
     }
