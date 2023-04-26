@@ -7,21 +7,20 @@ use std::{
     },
     process::Command,
 };
+use text_io::read;
 
 fn main() {
     let syllabus: Syllabus = Syllabus::new();
-    let mut line: String = String::new();
+    //TODO: Start working on the menu
     print!("Type something and hit enter: ");
     stdout().flush().unwrap();
-    stdin().read_line(&mut line).unwrap();
-    println!("You entered: {}", line);
-    //println!("{}[2J{}[1;1H", 27 as char, 27 as char);
+    let mut input: String = read!();
+    println!("You entered: {}", input);
 
-    clear_screen();
+    //clear_screen();
     print!("Type something else: ");
-    stdout().flush().unwrap();
-    stdin().read_line(&mut line).unwrap();
-    println!("You entered: {}", line);
+    input = read!();
+    println!("You entered: {}", input);
 }
 
 //NOTE: Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed
