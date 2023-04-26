@@ -187,17 +187,15 @@ impl<'a> GradeCategory {
                     });
                 }
 
+                self.scores = scores;
+
                 if self.dropped > 0 {
-                    scores.sort_by(|a, b| b.partial_cmp(a).unwrap());
+                    self.sort_scores();
                 }
 
                 if self.size != text.lines().count() {
-                    scores.resize(self.size as usize, -1.0);
-                    self.scores = scores;
+                    self.scores.resize(self.size as usize, -1.0);
                     self.export();
-                }
-                else {
-                    self.scores = scores;
                 }
             },
             Err(_) => {
@@ -205,6 +203,10 @@ impl<'a> GradeCategory {
                 self.export();
             }
         }
+    }
+
+    fn sort_scores (&mut self) {
+        self.scores.sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
     
     fn export (&self) {              //formerly write_scores_to_file(string)
@@ -225,8 +227,7 @@ impl<'a> GradeCategory {
     }
 
     fn calculate_total (&mut self) {
-        //TODO: Sort scores before calculating total
-        println!("scores: {:?}", self.scores);
+        self.sort_scores();
         self.total = self.scores.iter()
             .map(|&score|
                 if score < 0.0 {
@@ -236,11 +237,11 @@ impl<'a> GradeCategory {
                     return score;
                 })
             .reduce(|acc, val| acc + val).unwrap();
-            /* NOTE: The only way a None value might happen would be if I removed all the scores
-             *       from a file manually, but because of the way I have ensured that the scores
-             *       files exist and that sizes are always consistent, this will never happen;
-             *       unwrapping is safe here.
-             */
+        /* NOTE: The only way a None value might happen would be if I removed all the scores from
+         *       a file manually, but because of the way I have ensured that the scores files
+         *       exist and that sizes are always consistent, this will never happen; unwrapping
+         *       is safe here.
+         */
         self.total /= self.max_points as f32;
         self.total *= self.percentage;
     }
