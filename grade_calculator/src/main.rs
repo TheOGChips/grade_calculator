@@ -47,11 +47,10 @@ fn main() {
                     .unwrap()
                     .scores()
                     .contains(&-1.0) {
-                        //TODO: Change this message to use the syllabus and text file variables
                         println!("\nError: Cannot add anymore grades to this category!");
-                        println!("       Edit the syllabus file if you wish to add more grades");
-                        println!("       or edit the text file manually.");
-                        sleep(Duration::from_secs(7));
+                        println!("       Edit {} if you wish to add more grades.",
+                                 syllabus.filename());
+                        sleep(Duration::from_secs(5));
                 }
                 else {
                     print!("\nEnter new grade for {}: ",

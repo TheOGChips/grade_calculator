@@ -132,6 +132,10 @@ impl<'a> Syllabus {
     pub fn num_categories (&self) -> u8 {
         return self.num_categories as u8;
     }
+
+    pub fn filename (&self) -> &str {
+        return Self::FILENAME;
+    }
 }
 
 #[derive(Debug)]
@@ -252,7 +256,9 @@ impl<'a> GradeCategory {
         return &self.scores;
     }
 
-    fn _get_filename () {}
+    /*pub fn filename (&self) -> &str {
+        return &self.filename;
+    }*/
     fn _get_percentage () {}    //formerly get_percentage() const
     fn _get_max_points () {}
     fn _get_score () {}
