@@ -36,9 +36,9 @@ fn main() {
         };
 
         if selection == 0 || selection > num_selections {
+            clear_screen();
             //NOTE: For some reason, this doesn't print out when using eprintln.
             println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
-            sleep(Duration::from_secs(3));
         }
         else {
             if selection >= 1 && selection <= syllabus.num_categories() {
@@ -47,10 +47,10 @@ fn main() {
                     .unwrap()
                     .scores()
                     .contains(&-1.0) {
+                        clear_screen();
                         println!("\nError: Cannot add anymore grades to this category!");
                         println!("       Edit {} if you wish to add more grades.",
                                  syllabus.filename());
-                        sleep(Duration::from_secs(5));
                 }
                 else {
                     print!("\nEnter new grade for {}: ",
@@ -69,13 +69,13 @@ fn main() {
                             sleep(Duration::from_secs(2));
                         },
                     }
+                    clear_screen();
                 }
             }
             else if selection == num_selections - 1 {
                 //TODO: Calculate and print out the total score for the course
             }
         }
-        clear_screen();
     }
     /*print!("Type something and hit enter: ");
     stdout().flush().unwrap();
