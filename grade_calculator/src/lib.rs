@@ -201,7 +201,7 @@ impl<'a> GradeCategory {
         self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
-    fn export (&self) {              //formerly write_scores_to_file(string)
+    pub fn export (&self) {              //formerly write_scores_to_file(string)
         let scores: Vec<String> = self.scores.borrow()
             .iter()
             .map(|score| score.to_string())

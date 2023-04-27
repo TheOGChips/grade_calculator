@@ -65,7 +65,7 @@ fn main() {
                         }
                         else {
                             category.add_grade(grade);
-                            //TODO: Write new scores Vec to file
+                            category.export();
                         },
                         Err(msg) => {
                             println!("\nError: {}", msg);
