@@ -147,7 +147,6 @@ pub struct GradeCategory {
     size: usize,           //formerly num_elements
     max_points: u32,
     scores: RefCell<Vec<f32>>,
-    total: f32,         //formerly grade_total
     dropped: u8,        //formerly num_dropped_grades
 }
 
@@ -160,11 +159,9 @@ impl<'a> GradeCategory {
             size: size,
             max_points: (size - dropped as usize) as u32 * 100,
             scores: RefCell::new(Vec::new()),
-            total: 0.0,
             dropped: dropped,
         };
         category.import_scores();
-        category.calculate_total();
         return category;
     }
 
@@ -219,9 +216,9 @@ impl<'a> GradeCategory {
         }
     }
 
-    fn calculate_total (&mut self) {
-        self.sort_scores();
-        self.total = self.scores.borrow()
+    pub fn total (&self) -> f32 {
+        self.sort_scores();   //TODO: I don't think this actually needs to be here
+        let mut total: f32 = self.scores.borrow()
             .iter()
             .map(|&score|
                 if score < 0.0 {
@@ -231,14 +228,15 @@ impl<'a> GradeCategory {
                     return score;
                 })
             .reduce(|acc, val| acc + val).unwrap();
-
         /* NOTE: The only way a None value might happen would be if I removed all the scores from
          *       a file manually, but because of the way I have ensured that the scores files
          *       exist and that sizes are always consistent, this will never happen; unwrapping
          *       is safe here.
          */
-        self.total /= self.max_points as f32;
-        self.total *= self.percentage;
+
+        total /= self.max_points as f32;
+        total *= self.percentage;
+        return total;
     }
 
     pub fn add_grade (&self, grade: f32) {
@@ -270,6 +268,5 @@ impl<'a> GradeCategory {
     fn _get_percentage () {}    //formerly get_percentage() const
     fn _get_max_points () {}
     fn _get_score () {}
-    fn _get_total () {}         //formerly get_grade_total() const
     fn _get_dropped () {}       //formerly get_num_dropped_grades() const
 }
