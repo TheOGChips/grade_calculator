@@ -217,7 +217,6 @@ impl<'a> GradeCategory {
     }
 
     pub fn total (&self) -> f32 {
-        self.sort_scores();   //TODO: I don't think this actually needs to be here
         let mut total: f32 = self.scores.borrow()
             .iter()
             .map(|&score|
