@@ -76,7 +76,19 @@ fn main() {
                 }
             }
             else if selection == num_selections - 1 {
-                //TODO: Calculate and print out the total score for the course
+                let mut acc: f32 = 0.0;
+                for (_, category) in syllabus.categories() {
+                    acc += category.total();
+                }
+                acc *= 100.0;
+                let letter_grade: char =
+                    if acc >= 90.0 { 'A' }
+                    else if acc >= 80.0 { 'B' }
+                    else if acc >= 70.0 { 'C' }
+                    else if acc >= 60.0 { 'D' }
+                    else { 'F' };
+                clear_screen();
+                println!("\nCurrent course grade: {} -> {}", acc, letter_grade);
             }
         }
     }
