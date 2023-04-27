@@ -64,7 +64,8 @@ fn main() {
                             sleep(Duration::from_secs(2));
                         }
                         else {
-                            category.add_grade(grade); //TODO: Add the new grade to the GradeCategory's scores Vec
+                            category.add_grade(grade);
+                            //TODO: Write new scores Vec to file
                         },
                         Err(msg) => {
                             println!("\nError: {}", msg);

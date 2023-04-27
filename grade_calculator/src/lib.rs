@@ -241,7 +241,11 @@ impl<'a> GradeCategory {
         self.total *= self.percentage;
     }
 
-    pub fn add_grade (&self, grade: f32) {}
+    pub fn add_grade (&self, grade: f32) {
+        let scores: &mut Vec<f32> = &mut self.scores().borrow_mut();
+        let index: usize = scores.iter().position(|&x| x == -1.0).unwrap();
+        scores[index] = grade;
+    }
 
     //fn _set_name () {}          //formerly set_category(string)
     //fn _set_filename () {}
