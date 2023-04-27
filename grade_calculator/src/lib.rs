@@ -11,6 +11,8 @@ use std::{
     cell::RefCell,
 };
 
+//TODO: Clean up this file
+//TODO: Add doc comments
 pub struct Syllabus {
     categories: BTreeMap<usize, GradeCategory>,
     num_categories: usize,

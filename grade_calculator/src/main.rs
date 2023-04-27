@@ -14,11 +14,13 @@ use std::{
     time::Duration,
 };
 use text_io::read;
+use colored::Colorize;
 
+//TODO: Clean up this file
+//TODO: Add doc comments
 fn main() {
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
-    //TODO: Have the word "Error" show up in red
     let num_selections: u8 = syllabus.num_categories() + 2;
     let mut selection: u8 = 0;
     while selection != num_selections {
@@ -40,7 +42,8 @@ fn main() {
         if selection == 0 || selection > num_selections {
             clear_screen();
             //NOTE: For some reason, this doesn't print out when using eprintln.
-            println!("\nError: Invalid option! Choose a number between 1-{}\n", num_selections);
+            println!("\n{}: Invalid option! Choose a number between 1-{}",
+                     "Error".red().bold(), num_selections);
         }
         else {
             if selection >= 1 && selection <= syllabus.num_categories() {
@@ -49,16 +52,18 @@ fn main() {
                     .unwrap();
                 if !category.scores().borrow().contains(&-1.0) {
                         clear_screen();
-                        println!("\nError: Cannot add anymore grades to this category!");
+                        println!("\n{}: Cannot add anymore grades to this category!",
+                                 "Error".red().bold());
                         println!("       Edit {} if you wish to add more grades.",
-                                 syllabus.filename());
+                                 syllabus.filename().cyan());
                 }
                 else {
                     print!("\nEnter new grade for {}: ", category.name());
                     let grade: String = read!();
                     match grade.parse::<f32>() {
                         Ok(grade) => if grade < 0.0 || grade > 120.0 {
-                            println!("\nError: Grade value is outside valid range.");
+                            println!("\n{}: Grade value is outside valid range.",
+                                     "Error".red().bold());
                             sleep(Duration::from_secs(2));
                         }
                         else {
@@ -66,7 +71,7 @@ fn main() {
                             category.export();
                         },
                         Err(msg) => {
-                            println!("\nError: {}", msg);
+                            println!("\n{}: {}", "Error".red().bold(), msg);
                             sleep(Duration::from_secs(2));
                         },
                     }
@@ -79,12 +84,12 @@ fn main() {
                     acc += category.total();
                 }
                 acc *= 100.0;
-                let letter_grade: char =
-                    if acc >= 90.0 { 'A' }
-                    else if acc >= 80.0 { 'B' }
-                    else if acc >= 70.0 { 'C' }
-                    else if acc >= 60.0 { 'D' }
-                    else { 'F' };
+                let letter_grade: String =
+                    if acc >= 90.0 { format!("{}", "A".purple().bold()) }
+                    else if acc >= 80.0 { format!("{}", "B".green().bold()) }
+                    else if acc >= 70.0 { format!("{}", "C".green().bold()) }
+                    else if acc >= 60.0 { format!("{}", "D".yellow().bold()) }
+                    else { format!("{}", "F".red().bold()) };
                 clear_screen();
                 println!("\nCurrent course grade: {} -> {}", acc, letter_grade);
             }
