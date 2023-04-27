@@ -8,6 +8,7 @@ use std::{
         btree_map::Iter,
     },
     iter::zip,
+    cell::RefCell,
 };
 
 pub struct Syllabus {
@@ -145,7 +146,7 @@ pub struct GradeCategory {
     percentage: f32,    //formerly percent_grade
     size: usize,           //formerly num_elements
     max_points: u32,
-    scores: Vec<f32>,
+    scores: RefCell<Vec<f32>>,
     total: f32,         //formerly grade_total
     dropped: u8,        //formerly num_dropped_grades
 }
@@ -158,7 +159,7 @@ impl<'a> GradeCategory {
             percentage: percent,
             size: size,
             max_points: (size - dropped as usize) as u32 * 100,
-            scores: Vec::new(),
+            scores: RefCell::new(Vec::new()),
             total: 0.0,
             dropped: dropped,
         };
@@ -171,7 +172,7 @@ impl<'a> GradeCategory {
         match fs::read_to_string(&self.filename) {
             Ok(text) => {
                 for line in text.lines() {
-                    self.scores.push(match line.parse() {
+                    self.scores.borrow_mut().push(match line.parse() {
                         Ok(num) => num,
                         Err(msg) => {
                             eprintln!("Error: '{msg}' while reading in scores from {}", self.filename);
@@ -185,23 +186,24 @@ impl<'a> GradeCategory {
                 }
 
                 if self.size != text.lines().count() {
-                    self.scores.resize(self.size as usize, -1.0);
+                    self.scores.borrow_mut().resize(self.size as usize, -1.0);
                     self.export();
                 }
             },
             Err(_) => {
-                self.scores = vec![-1.0; self.size as usize];
+                self.scores.replace(vec![-1.0; self.size as usize]);
                 self.export();
             }
         }
     }
 
     fn sort_scores (&mut self) {    //formerly bubble_sort
-        self.scores.sort_by(|a, b| b.partial_cmp(a).unwrap());
+        self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
     fn export (&self) {              //formerly write_scores_to_file(string)
-        let scores: Vec<String> = self.scores.iter()
+        let scores: Vec<String> = self.scores.borrow()
+            .iter()
             .map(|score| score.to_string())
             .collect();
         let mut buffer = match fs::File::create(&self.filename) {
@@ -219,7 +221,8 @@ impl<'a> GradeCategory {
 
     fn calculate_total (&mut self) {
         self.sort_scores();
-        self.total = self.scores.iter()
+        self.total = self.scores.borrow()
+            .iter()
             .map(|&score|
                 if score < 0.0 {
                     return 0.0;
@@ -228,6 +231,7 @@ impl<'a> GradeCategory {
                     return score;
                 })
             .reduce(|acc, val| acc + val).unwrap();
+
         /* NOTE: The only way a None value might happen would be if I removed all the scores from
          *       a file manually, but because of the way I have ensured that the scores files
          *       exist and that sizes are always consistent, this will never happen; unwrapping
@@ -237,7 +241,7 @@ impl<'a> GradeCategory {
         self.total *= self.percentage;
     }
 
-    fn _enter_new_score () {}
+    pub fn add_grade (&self, grade: f32) {}
 
     //fn _set_name () {}          //formerly set_category(string)
     //fn _set_filename () {}
@@ -252,7 +256,7 @@ impl<'a> GradeCategory {
         return &self.name;
     }
 
-    pub fn scores (&self) -> &Vec<f32> {
+    pub fn scores (&self) -> &RefCell<Vec<f32>> {
         return &self.scores;
     }
 

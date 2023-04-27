@@ -1,4 +1,7 @@
-use grade_calculator::Syllabus;
+use grade_calculator::{
+    Syllabus,
+    GradeCategory,
+};
 use std::{
     io::{
         stdin,
@@ -17,6 +20,7 @@ fn main() {
     let syllabus: Syllabus = Syllabus::new();
     //TODO: Also need to calculate total course grade beforehand, maybe?
     //TODO: Start working on the menu
+    //TODO: Have the word "Error" show up in red
     let num_selections: u8 = syllabus.num_categories() + 2;
     let mut selection: u8 = 0;
     while selection != num_selections {
@@ -42,27 +46,25 @@ fn main() {
         }
         else {
             if selection >= 1 && selection <= syllabus.num_categories() {
-                if !syllabus.categories()
+                let category: &GradeCategory = syllabus.categories()
                     .get(&usize::from(selection))
-                    .unwrap()
-                    .scores()
-                    .contains(&-1.0) {
+                    .unwrap();
+                if !category.scores().borrow().contains(&-1.0) {
                         clear_screen();
                         println!("\nError: Cannot add anymore grades to this category!");
                         println!("       Edit {} if you wish to add more grades.",
                                  syllabus.filename());
                 }
                 else {
-                    print!("\nEnter new grade for {}: ",
-                           syllabus.categories().get(&usize::from(selection)).unwrap().name());
+                    print!("\nEnter new grade for {}: ", category.name());
                     let grade: String = read!();
                     match grade.parse::<f32>() {
-                        Ok(num) => if num < 0.0 || num > 120.0 {
+                        Ok(grade) => if grade < 0.0 || grade > 120.0 {
                             println!("\nError: Grade value is outside valid range.");
                             sleep(Duration::from_secs(2));
                         }
                         else {
-                            todo!(); //TODO: Add the new grade to the GradeCategory's scores Vec
+                            category.add_grade(grade); //TODO: Add the new grade to the GradeCategory's scores Vec
                         },
                         Err(msg) => {
                             println!("\nError: {}", msg);
