@@ -18,8 +18,6 @@ use text_io::read;
 fn main() {
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
-    //TODO: Also need to calculate total course grade beforehand, maybe?
-    //TODO: Start working on the menu
     //TODO: Have the word "Error" show up in red
     let num_selections: u8 = syllabus.num_categories() + 2;
     let mut selection: u8 = 0;
@@ -106,6 +104,7 @@ fn main() {
         Ok(n) => println!("num: {}", n),
         Err(msg) => eprintln!("Error: {}", msg),
     };*/
+    println!();
 }
 
 //NOTE: Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed
