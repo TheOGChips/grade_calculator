@@ -17,7 +17,6 @@ use text_io::read;
 use colored::Colorize;
 
 //TODO: Clean up this file
-//TODO: Add doc comments
 fn main() {
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
@@ -25,6 +24,7 @@ fn main() {
     let mut selection: u8 = 0;
     while selection != num_selections {
         println!("\n------ MENU ------");
+        //NOTE: Display the menu and prompt for user input
         //for (category, cat_no) in zip(syllabus.categories(), 1..=syllabus.num_categories()) {
         for category in syllabus.categories() {
             //println!("{}: {}", cat_no, category.name());
@@ -39,6 +39,11 @@ fn main() {
             Err(_) => 0,
         };
 
+        /* NOTE:
+         * if the user input is invalid
+         *      then clear the screen and print an error message
+         * else act appropriately
+         */
         if selection == 0 || selection > num_selections {
             clear_screen();
             //NOTE: For some reason, this doesn't print out when using eprintln.
@@ -46,10 +51,24 @@ fn main() {
                      "Error".red().bold(), num_selections);
         }
         else {
+            /* NOTE:
+             * if the user selects one of the grade categories
+             *      then prompt the user to enter a new grade for the category
+             * else if the user selects to print out the current course grade
+             *      then do so
+             * else
+             *      let the loop (and therefore the program) end
+             */
             if selection >= 1 && selection <= syllabus.num_categories() {
                 let category: &GradeCategory = syllabus.categories()
                     .get(&usize::from(selection))
                     .unwrap();
+                /* NOTE:
+                 * if the current category is full (no -1 entries left)
+                 *      then print error message saying so and continue with next loop iteration
+                 * else
+                 *      prompt the user to enter a new grade
+                 */
                 if !category.scores().borrow().contains(&-1.0) {
                         clear_screen();
                         println!("\n{}: Cannot add anymore grades to this category!",
@@ -59,8 +78,19 @@ fn main() {
                 }
                 else {
                     print!("\nEnter new grade for {}: ", category.name());
+
+                    /* NOTE:
+                     * if the user enters a grade outside the valid range of 0-120 or
+                     *    the user enters something otherwise invalid
+                     *      then print error message saying so and continue with next loop
+                     *           iteration
+                     * else
+                     *      add the grade to the category and write the grades back out to their
+                     *      input file
+                     */
                     let grade: String = read!();
                     match grade.parse::<f32>() {
+                        //NOTE: it's possible to receive an individual grade higher than 100
                         Ok(grade) => if grade < 0.0 || grade > 120.0 {
                             println!("\n{}: Grade value is outside valid range.",
                                      "Error".red().bold());
@@ -112,7 +142,10 @@ fn main() {
     println!();
 }
 
-//NOTE: Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed
+/**
+ * Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed
+ * Clears the screen and scrollback history.
+ */
 fn clear_screen () {
     if cfg!(target_os = "windows") {
         Command::new("cls").status().unwrap();

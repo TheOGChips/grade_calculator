@@ -1,3 +1,6 @@
+/**
+ * A program for calculating one's overall grade for courses based on the course syllabus.
+ */
 use std::{
     fs,
     process,
@@ -13,16 +16,39 @@ use std::{
 
 //TODO: Clean up this file
 //TODO: Add doc comments
+/**
+ * The syllabus for the course, containing the breakdown of course grade categories (the
+ * percentage each category is worth) overall. Also keeps track of the number of categories.
+ */
 pub struct Syllabus {
     categories: BTreeMap<usize, GradeCategory>,
     num_categories: usize,
 }
 
 impl<'a> Syllabus {
+    /// The filename containing the syllabus information. This will always be "syllabus.csv".
     const FILENAME: &'a str = "syllabus.csv";
 
+    /**
+     * Creates a new instance of a Syllabus object. Requires the presence of a file named
+     * `syllabus.csv` with the header line `category,percent,size,dropped`.
+     *
+     * `category` -> `String`
+     *
+     * `percent` -> `f32`
+     *
+     * `size` -> `usize`
+     *
+     * `dropped` -> `u8`
+     */
     pub fn new () -> Self {
         const HEADER_LINE: &str = "category,percent,size,dropped";
+        /* NOTE:
+         * if the syllabus file could be read
+         *      then return its contents
+         * else
+         *      print an error that the file (most likely) doesn't exist
+         */
         let syllabus: String = match fs::read_to_string(Self::FILENAME) {
             Ok(text) => text,
             Err(msg) => {
@@ -32,6 +58,18 @@ impl<'a> Syllabus {
             },
         };
 
+        /* NOTE:
+         * if the syllabus file was empty
+         *      then print an error message saying so
+         *           print what the header line should look like
+         * else if the header line is wrong
+         *      then print an error message saying so
+         *           print what the header line should look like
+         * else if the syllabus file only has one line (and no entries)
+         *      then print an error message saying so and that at least one entry is required
+         * else
+         *      parse each entry of the syllabus file to create GradeCategory entries
+         */
         if syllabus.is_empty() {
             eprintln!("Error: {} is empty", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
@@ -49,6 +87,10 @@ impl<'a> Syllabus {
             let num_categories: usize = syllabus.lines().count() - 1;
             let mut categories: BTreeMap<usize, GradeCategory> = BTreeMap::new();
 
+            /* NOTE:
+             * Parse each line of the syllabus file and pass the resulting tuple directly to
+             * create a new GradeCategory object.
+             */
             for (line, cat_no) in zip(syllabus.lines().skip(1), 1..=num_categories) {
                 let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
                 categories.insert(cat_no, category);
@@ -61,6 +103,7 @@ impl<'a> Syllabus {
         }
     }
 
+    // Displays an error message if the header line of `syllabus.csv` is improperly formatted.
     fn display_header_format_msg (header_line: &str) -> ! {
         eprintln!("       Use the following for the header line:");
         eprintln!("           {}\n", header_line);
@@ -68,12 +111,17 @@ impl<'a> Syllabus {
         process::exit(1);
     }
 
+    // Displays an error message if a particular entry in `syllabus.csv` is improperly formatted.
     fn display_entry_parse_err_msg (name: &str) -> ! {
         eprintln!("       Check that '{}' entry is formatted correctly in {}", name,
                   Self::FILENAME);
         process::exit(1);
     }
 
+    /* Parses a line from `syllabus.csv` to read the category name, percentage, number of items
+     * in the category, and the number of dropped items for that category (those that won't count
+     * towards the final grade calculation).
+     */
     fn parse_line (line: &str) -> (String, f32, usize,  u8) {
         let mut tokens: std::str::Split<&str> = line.split(",");
         /* NOTE: Decided to use static here instead of a mutable borrow because count isn't used
@@ -85,9 +133,16 @@ impl<'a> Syllabus {
         }
 
         /* NOTE: Unwrapping is okay here since I just need to check that the category
-            *       name isn't empty, and None will never happen.
-            */
+         *       name isn't empty, and None will never happen.
+         */
         let name: &str = tokens.next().unwrap();
+
+        /* NOTE:
+         * if name is empty
+         *      then the entry is improperly formatted
+         * else
+         *      continue parsing each column of the syllabus file
+         */
         if name.is_empty() {
             unsafe {
                 eprintln!("Error: No category name provided for syllabus entry on line {}", COUNT);
@@ -108,9 +163,20 @@ impl<'a> Syllabus {
         return (name.to_string(), percent, size, dropped);
     }
 
+    /* Parses a token from the current line being parsed in `syllabus.csv`.
+     */
     fn parse_token<T> (token: Option<&str>, name: &str, column: &str) -> T
     where T: FromStr,
           <T as FromStr>::Err: std::fmt::Display {
+        /* NOTE:
+         * if token exists
+         *      then unwrap from Option, parse it, and return it
+         * else if an error occurs while parsing the token
+         *      print an error saying so with specific information about the current entry
+         * else
+         *      print error message that the category entry was unable to be read with specific
+         *      information about the current entry
+         */
         return match token {
             Some(token) => match token.parse::<T>() {
                 Ok(token) => token,
@@ -127,15 +193,26 @@ impl<'a> Syllabus {
         };
     }
 
-    //pub fn categories (&self) -> Iter<usize, GradeCategory> {
+    /**
+     * Returns a binary tree map of the list of categories. Keys are unsigned integers in the
+     * range `1..Syllabus::size`. Values are `GradeCategory`s.
+     */
     pub fn categories (&self) -> &BTreeMap<usize, GradeCategory> {
         return &self.categories;
     }
 
+    /**
+     * Returns the number of categories as imported from `syllabus.csv` as a `u8`. This will be
+     * the same as the number of lines after the header line of `syllabus.csv`.
+     */
     pub fn num_categories (&self) -> u8 {
         return self.num_categories as u8;
     }
 
+    /**
+     * Returns the name of the syllabus file. This should always be `syllabus.csv` and is a
+     * constant defined within `Syllabus`.
+     */
     pub fn filename (&self) -> &str {
         return Self::FILENAME;
     }
