@@ -3,20 +3,13 @@ use grade_calculator::{
     GradeCategory,
 };
 use std::{
-    io::{
-        stdin,
-        stdout,
-        Write,
-    },
     process::Command,
-    iter::zip,
     thread::sleep,
     time::Duration,
 };
 use text_io::read;
 use colored::Colorize;
 
-//TODO: Clean up this file
 fn main() {
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
@@ -25,9 +18,7 @@ fn main() {
     while selection != num_selections {
         println!("\n------ MENU ------");
         //NOTE: Display the menu and prompt for user input
-        //for (category, cat_no) in zip(syllabus.categories(), 1..=syllabus.num_categories()) {
         for category in syllabus.categories() {
-            //println!("{}: {}", cat_no, category.name());
             println!("{}: {}", category.0, category.1.name());
         }
         println!("{}: Display final grade", num_selections - 1);
@@ -125,20 +116,6 @@ fn main() {
             }
         }
     }
-    /*print!("Type something and hit enter: ");
-    stdout().flush().unwrap();
-    let mut input: String = read!();
-    println!("You entered: {}", input);
-
-    //clear_screen();
-    print!("Type something else: ");
-    input = read!();
-    println!("You entered: {}", input);
-    let num: String = read!();
-    match num.parse::<u8>() {
-        Ok(n) => println!("num: {}", n),
-        Err(msg) => eprintln!("Error: {}", msg),
-    };*/
     println!();
 }
 

@@ -6,15 +6,12 @@ use std::{
     process,
     str::FromStr,
     io::Write,
-    collections::{  //NOTE: Using BTreeMap to have a guaranteed iteration order in the menu
-        BTreeMap,
-        btree_map::Iter,
-    },
+    //NOTE: Using BTreeMap to have a guaranteed iteration order in the menu
+    collections::BTreeMap,
     iter::zip,
     cell::RefCell,
 };
 
-//TODO: Clean up this file
 /**
  * The syllabus for the course, containing the breakdown of course grade categories (the
  * percentage each category is worth) overall. Also keeps track of the number of categories.
@@ -148,17 +145,9 @@ impl<'a> Syllabus {
             }
             process::exit(1);
         }
-        //println!("name: {}", name);
-
         let percent: f32 = Self::parse_token::<f32>(tokens.next(), name, "percentage") / 100.0;
-        //println!("percent: {}", percent);
-
         let size: usize = Self::parse_token::<usize>(tokens.next(), name, "size");
-        //println!("size: {}", size);
-
         let dropped: u8 = Self::parse_token::<u8>(tokens.next(), name, "dropped");
-        //println!("dropped: {}", dropped);
-
         return (name.to_string(), percent, size, dropped);
     }
 
@@ -225,13 +214,13 @@ impl<'a> Syllabus {
  */
 #[derive(Debug)]
 pub struct GradeCategory {
-    name: String,         //formerly category
+    name: String,
     filename: String,
-    percentage: f32,    //formerly percent_grade
-    size: usize,           //formerly num_elements
+    percentage: f32,
+    size: usize,
     max_points: u32,
     scores: RefCell<Vec<f32>>,
-    dropped: u8,        //formerly num_dropped_grades
+    dropped: u8,
 }
 
 impl<'a> GradeCategory {
@@ -257,7 +246,7 @@ impl<'a> GradeCategory {
      * it will be created and populated with `-1`s, which represent
      * missing/unrecorded grades/scores.
      */
-    fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
+    fn import_scores (&mut self) {
         /* NOTE:
          * Attempt to read in scores from a file. If the file doesn't exist,
          * create it instead.
@@ -304,7 +293,7 @@ impl<'a> GradeCategory {
 
     /* Sorts the grades in the Vec from the scores field.
      */
-    fn sort_scores (&mut self) {    //formerly bubble_sort
+    fn sort_scores (&mut self) {
         self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
@@ -312,7 +301,7 @@ impl<'a> GradeCategory {
      * Exports the current grades Vec to `filename`. This always overwrites the
      * previous contents of `filename`.
      */
-    pub fn export (&self) {              //formerly write_scores_to_file(string)
+    pub fn export (&self) {
         /* NOTE:
          * Borrow the RefCell and return a Vec with the values converted to
          * Strings for writing to a file later.
@@ -335,14 +324,14 @@ impl<'a> GradeCategory {
         };
 
         for score in scores {
-            writeln!(buffer, "{}", score);
+            writeln!(buffer, "{}", score).unwrap();
         }
     }
 
     /**
      * Calculates the total score this category will contribute to the overall
      * course grade using the scores from `filename`. This will return a number
-     * between \[0,1\]. The accumulated scores from all categories for a course
+     * between \[0, 1\]. The accumulated scores from all categories for a course
      * will yield 1.0 for a perfect final grade in the course.
      */
     pub fn total (&self) -> f32 {
@@ -379,7 +368,8 @@ impl<'a> GradeCategory {
     }
 
     /**
-     * Adds a grade the scores `Vec` . The new grade will replace the next `-1` in the `Vec`. The possibility of no -1s is handled prior to this function being called.
+     * Adds a grade the scores `Vec` . The new grade will replace the next `-1` in the `Vec`. The
+     * possibility of no -1s is handled prior to this function being called.
      */
     pub fn add_grade (&self, grade: f32) {
         let scores: &mut Vec<f32> = &mut self.scores().borrow_mut();
@@ -387,19 +377,10 @@ impl<'a> GradeCategory {
         scores[index] = grade;
     }
 
-    //fn _set_name () {}          //formerly set_category(string)
-    //fn _set_filename () {}
-    //fn _set_percentage () {}    //formerly set_percent_grade(float)
-    //fn _set_size () {}          //formerly set_num_elements(const unsigned int, string)
-    //fn _line_count () {}
-    //fn _set_scores () {}
-    //fn _set_total () {}         //formerly set_grade_total()
-    //fn _set_dropped () {}       //formerly set_num_dropped_grades(int)
-
     /**
      * Returns the name of the category as recorded in syllabus.csv.
      */
-    pub fn name (&self) -> &str {      //formerly get_category_name() const
+    pub fn name (&self) -> &str {
         return &self.name;
     }
 
@@ -410,12 +391,4 @@ impl<'a> GradeCategory {
     pub fn scores (&self) -> &RefCell<Vec<f32>> {
         return &self.scores;
     }
-
-    /*pub fn filename (&self) -> &str {
-        return &self.filename;
-    }*/
-    fn _get_percentage () {}    //formerly get_percentage() const
-    fn _get_max_points () {}
-    fn _get_score () {}
-    fn _get_dropped () {}       //formerly get_num_dropped_grades() const
 }
