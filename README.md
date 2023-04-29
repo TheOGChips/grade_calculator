@@ -33,3 +33,11 @@ Either move or link to the binary at the path mentioned above. At a terminal pro
 
 - Windows
 >`>grade_calculator.exe`
+
+# Documentation
+
+To view this crate's documentation, open a terminal window at the path mentioned above and type the following:
+
+>`$ cargo doc --open`
+
+The documentation should open up in your default web browser.
