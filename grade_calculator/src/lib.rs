@@ -15,7 +15,6 @@ use std::{
 };
 
 //TODO: Clean up this file
-//TODO: Add doc comments
 /**
  * The syllabus for the course, containing the breakdown of course grade categories (the
  * percentage each category is worth) overall. Also keeps track of the number of categories.
@@ -218,6 +217,12 @@ impl<'a> Syllabus {
     }
 }
 
+/**
+ * Represents a category as defined in `syllabus.csv`. A `RefCell` is used for
+ * the `scores` field as it's the only field that will need to be mutable once
+ * an instance is created. In other words, the `Vec` of scores will be the only
+ * thing that will need to be modified at runtime.
+ */
 #[derive(Debug)]
 pub struct GradeCategory {
     name: String,         //formerly category
@@ -230,6 +235,9 @@ pub struct GradeCategory {
 }
 
 impl<'a> GradeCategory {
+    /* Returns a new GradeCategory instance using the values in the provided
+     * tuple.
+     */
     fn new ((name, percent, size, dropped): (String, f32, usize, u8)) -> GradeCategory {
         let mut category: GradeCategory = GradeCategory {
             filename: format!("{}.txt", name),
@@ -244,9 +252,22 @@ impl<'a> GradeCategory {
         return category;
     }
 
+    /* Imports grades for the category from `self.filename`. The file will
+     * contain one grade/score per line. If `filename` doesn't already exist,
+     * it will be created and populated with `-1`s, which represent
+     * missing/unrecorded grades/scores.
+     */
     fn import_scores (&mut self) {  //formerly read_scores_from_file(string)
+        /* NOTE:
+         * Attempt to read in scores from a file. If the file doesn't exist,
+         * create it instead.
+         */
         match fs::read_to_string(&self.filename) {
             Ok(text) => {
+                /* NOTE:
+                 * Read and parse each score one line/score at a time. If there
+                 * is an error, print the error message and exit.
+                 */
                 for line in text.lines() {
                     self.scores.borrow_mut().push(match line.parse() {
                         Ok(num) => num,
@@ -257,10 +278,18 @@ impl<'a> GradeCategory {
                     });
                 }
 
+                // NOTE: If this category has dropped scores, sort the Vec.
                 if self.dropped > 0 {
                     self.sort_scores();
                 }
 
+                /* NOTE:
+                 * If the size in syllabus.csv doesn't match the number of
+                 * lines in the scores file, then the syllabus.csv file has
+                 * been modified since the last time this program was run.
+                 * Update the scores file to match syllabus.csv by resizing the
+                 * scrores Vec and immediately exporting it.
+                 */
                 if self.size != text.lines().count() {
                     self.scores.borrow_mut().resize(self.size as usize, -1.0);
                     self.export();
@@ -273,15 +302,30 @@ impl<'a> GradeCategory {
         }
     }
 
+    /* Sorts the grades in the Vec from the scores field.
+     */
     fn sort_scores (&mut self) {    //formerly bubble_sort
         self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
+    /**
+     * Exports the current grades Vec to `filename`. This always overwrites the
+     * previous contents of `filename`.
+     */
     pub fn export (&self) {              //formerly write_scores_to_file(string)
+        /* NOTE:
+         * Borrow the RefCell and return a Vec with the values converted to
+         * Strings for writing to a file later.
+         */
         let scores: Vec<String> = self.scores.borrow()
             .iter()
             .map(|score| score.to_string())
             .collect();
+            
+        /* NOTE:
+         * Attempt to create a buffer from filename. Print out an error message
+         * and exit if an error occurs.
+         */
         let mut buffer = match fs::File::create(&self.filename) {
             Ok(fp) => fp,
             Err(msg) => {
@@ -295,7 +339,17 @@ impl<'a> GradeCategory {
         }
     }
 
+    /**
+     * Calculates the total score this category will contribute to the overall
+     * course grade using the scores from `filename`. This will return a number
+     * between \[0,1\]. The accumulated scores from all categories for a course
+     * will yield 1.0 for a perfect final grade in the course.
+     */
     pub fn total (&self) -> f32 {
+        /* NOTE:
+         * Accumulate a category total by iterating through the scores Vec,
+         * mapping -1 -> 0 for adding to the accumulator.
+         */
         let mut total: f32 = self.scores.borrow()
             .iter()
             .map(|&score|
@@ -312,11 +366,21 @@ impl<'a> GradeCategory {
          *       is safe here.
          */
 
+        /* NOTE:
+         * Divide the accumulated value by the number of max points possible
+         * for the category (number of entries in the file * 100). Then,
+         * multiply that value by the percentage the category is worth to get
+         * the value this category is currently contributing to the final
+         * course grade. Return this final value.
+         */
         total /= self.max_points as f32;
         total *= self.percentage;
         return total;
     }
 
+    /**
+     * Adds a grade the scores `Vec` . The new grade will replace the next `-1` in the `Vec`. The possibility of no -1s is handled prior to this function being called.
+     */
     pub fn add_grade (&self, grade: f32) {
         let scores: &mut Vec<f32> = &mut self.scores().borrow_mut();
         let index: usize = scores.iter().position(|&x| x == -1.0).unwrap();
@@ -332,10 +396,17 @@ impl<'a> GradeCategory {
     //fn _set_total () {}         //formerly set_grade_total()
     //fn _set_dropped () {}       //formerly set_num_dropped_grades(int)
 
+    /**
+     * Returns the name of the category as recorded in syllabus.csv.
+     */
     pub fn name (&self) -> &str {      //formerly get_category_name() const
         return &self.name;
     }
 
+    /**
+     * Returns a reference to the `RefCell` containing the `Vec` of scores for
+     * this category.
+     */
     pub fn scores (&self) -> &RefCell<Vec<f32>> {
         return &self.scores;
     }
