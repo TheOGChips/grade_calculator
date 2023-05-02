@@ -1,14 +1,14 @@
 use grade_calculator::{
     Syllabus,
-    GradeCategory,
+    //GradeCategory,
 };
 use std::{
     process::Command,
-    thread::sleep,
-    time::Duration,
+    //thread::sleep,
+    //time::Duration,
 };
-use text_io::read;
-use colored::Colorize;
+//use text_io::read;
+//use colored::Colorize;
 use cursive::{
     CursiveRunnable,
     views::{
@@ -16,7 +16,12 @@ use cursive::{
         LinearLayout,
         Button,
     },
-    Cursive,
+    //Cursive,
+    //align::HAlign,
+};
+use cursive_aligned_view::{
+    //AlignedView,
+    Alignable,
 };
 
 fn main() {
@@ -24,18 +29,21 @@ fn main() {
 
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
-    let num_selections: u8 = syllabus.num_categories() + 2;
-    let mut selection: u8 = 0;
+    //let num_selections: u8 = syllabus.num_categories() + 2;
+    //let mut selection: u8 = 0;
 
     let mut options: LinearLayout = LinearLayout::vertical();
     for category in syllabus.categories() {
-        options.add_child(Button::new(format!("{}", category.1.name()), Cursive::quit));
+        options.add_child(Button::new(format!("{}", category.1.name()), |s| s.quit()));
     }
 
     //TODO: Read in course name from syllabus file as well to display in menu
-    tui.add_layer(Dialog::around(options)
+    //TODO: Have the current final grade displayed instead of requiring the user to select it
+    tui.add_layer(Dialog::around(options.align_top_left())
         .title(format!("{} Grade Calculator", "<COURSE NAME>"))
-        .button("Quit", Cursive::quit)
+        .button("Quit", |s| s.quit())
+        //.padding_right(25)
+        //.h_align(HAlign::Left)
     );
 
     /*while selection != num_selections {
