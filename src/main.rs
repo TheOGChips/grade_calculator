@@ -25,7 +25,12 @@ fn main() {
     //let mut selection: u8 = 0;
 
     let mut list: LinearLayout = LinearLayout::vertical();
-    let mut options: SelectView<String> = SelectView::new().on_submit(|s: &mut Cursive, _: &str| s.quit());
+    let mut options: SelectView<String> = SelectView::new().on_submit(
+        |s: &mut Cursive, name: &str| s.add_layer(
+            Dialog::around(TextView::new(format!("You will input a grade for {} here", name)))
+                .button("Back", |s| { s.pop_layer(); })
+        )
+    );
     for category in syllabus.categories() {
         //TODO: Need to add functionality here besides just quitting the program.
         options.add_item_str(format!("{}", category.name()));
