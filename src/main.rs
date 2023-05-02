@@ -15,9 +15,11 @@ use cursive::{
         Dialog,
         LinearLayout,
         Button,
+        TextView,
+        DummyView,
     },
     //Cursive,
-    //align::HAlign,
+    align::VAlign,
 };
 use cursive_aligned_view::{
     //AlignedView,
@@ -37,15 +39,16 @@ fn main() {
         options.add_child(Button::new(format!("{}", category.1.name()), |s| s.quit()));
     }
 
+    let final_grade: TextView = TextView::new(format!("Current course grade: {} -> {}", "?", "?"));
+    options.add_child(DummyView);
+    options.add_child(final_grade);
+
     //TODO: Read in course name from syllabus file as well to display in menu
     //TODO: Have the current final grade displayed instead of requiring the user to select it
     tui.add_layer(Dialog::around(options.align_top_left())
         .title(format!("{} Grade Calculator", "<COURSE NAME>"))
         .button("Quit", |s| s.quit())
-        //.padding_right(25)
-        //.h_align(HAlign::Left)
     );
-
     /*while selection != num_selections {
         println!("\n------ MENU ------");
         //NOTE: Display the menu and prompt for user input
