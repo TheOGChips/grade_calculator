@@ -6,9 +6,6 @@ use std::{
     process,
     str::FromStr,
     io::Write,
-    //NOTE: Using BTreeMap to have a guaranteed iteration order in the menu
-    collections::BTreeMap,
-    iter::zip,
     cell::RefCell,
 };
 
@@ -17,7 +14,7 @@ use std::{
  * percentage each category is worth) overall. Also keeps track of the number of categories.
  */
 pub struct Syllabus {
-    categories: BTreeMap<usize, GradeCategory>,
+    categories: Vec<GradeCategory>,
     num_categories: usize,
 }
 
@@ -81,15 +78,15 @@ impl<'a> Syllabus {
         }
         else {
             let num_categories: usize = syllabus.lines().count() - 1;
-            let mut categories: BTreeMap<usize, GradeCategory> = BTreeMap::new();
+            let mut categories: Vec<GradeCategory> = Vec::new();
 
             /* NOTE:
              * Parse each line of the syllabus file and pass the resulting tuple directly to
              * create a new GradeCategory object.
              */
-            for (line, cat_no) in zip(syllabus.lines().skip(1), 1..=num_categories) {
+            for line in syllabus.lines().skip(1) {
                 let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
-                categories.insert(cat_no, category);
+                categories.push(category);
             }
 
             return Syllabus {
@@ -185,7 +182,7 @@ impl<'a> Syllabus {
      * Returns a binary tree map of the list of categories. Keys are unsigned integers in the
      * range `1..Syllabus::size`. Values are `GradeCategory`s.
      */
-    pub fn categories (&self) -> &BTreeMap<usize, GradeCategory> {
+    pub fn categories (&self) -> &Vec<GradeCategory> {
         return &self.categories;
     }
 

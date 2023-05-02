@@ -19,7 +19,7 @@ use cursive::{
         DummyView,
     },
     //Cursive,
-    align::VAlign,
+    //align::VAlign,
 };
 use cursive_aligned_view::{
     //AlignedView,
@@ -36,7 +36,7 @@ fn main() {
 
     let mut options: LinearLayout = LinearLayout::vertical();
     for category in syllabus.categories() {
-        options.add_child(Button::new(format!("{}", category.1.name()), |s| s.quit()));
+        options.add_child(Button::new(format!("{}", category.name()), |s| s.quit()));
     }
 
     let final_grade: TextView = TextView::new(format!("Current course grade: {} -> {}", "?", "?"));
