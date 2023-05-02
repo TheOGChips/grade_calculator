@@ -16,6 +16,7 @@ categories = ["command-line-utilities"]
 colored = "2.0.0"
 text_io = "0.1.12"
 cursive-aligned-view = "0.6.0"
+clearscreen = "2.0.1"
 
 [dependencies.cursive]
 version = "0.20.0"

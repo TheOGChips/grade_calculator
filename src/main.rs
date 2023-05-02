@@ -29,13 +29,13 @@ use cursive_aligned_view::{
 fn main() {
     let mut tui: CursiveRunnable = cursive::default();
 
-    clear_screen();   //TODO: This needs to go somewhere else
     let syllabus: Syllabus = Syllabus::new();
     //let num_selections: u8 = syllabus.num_categories() + 2;
     //let mut selection: u8 = 0;
 
     let mut options: LinearLayout = LinearLayout::vertical();
     for category in syllabus.categories() {
+        //TODO: Need to add functionality here besides just quitting the program.
         options.add_child(Button::new(format!("{}", category.name()), |s| s.quit()));
     }
 
@@ -43,7 +43,6 @@ fn main() {
     options.add_child(DummyView);
     options.add_child(final_grade);
 
-    //TODO: Read in course name from syllabus file as well to display in menu
     //TODO: Have the current final grade displayed instead of requiring the user to select it
     tui.add_layer(Dialog::around(options.align_top_left())
         .title(format!("{} Grade Calculator", syllabus.name()))
@@ -153,25 +152,5 @@ fn main() {
     println!();*/
 
     tui.run();
-}
-
-/**
- * Source: https://stackoverflow.com/questions/34837011/how-to-clear-the-terminal-screen-in-rust-after-a-new-line-is-printed
- * Clears the screen and scrollback history.
- */
-fn clear_screen () {
-    if cfg!(target_os = "windows") {
-        Command::new("cls").status().unwrap();
-    }
-    else if cfg!(target_os = "macos") {
-        /* NOTE: Only because clear doesn't behave the same on macOS as it does on Linux by
-         *       default. The scrollback history is preserved on macOS, whereas on Linux it isn't
-         *       (at least on all the distros I've used).
-         */
-        let esc: char = 27 as char;
-        print!("{}c{}[3J", esc, esc);
-    }
-    else {
-        Command::new("clear").status().unwrap();
-    }
+    clearscreen::clear();
 }
