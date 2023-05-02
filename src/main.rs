@@ -2,29 +2,20 @@ use grade_calculator::{
     Syllabus,
     //GradeCategory,
 };
-use std::{
-    process::Command,
-    //thread::sleep,
-    //time::Duration,
-};
-//use text_io::read;
-//use colored::Colorize;
 use cursive::{
     CursiveRunnable,
     views::{
         Dialog,
         LinearLayout,
-        Button,
         TextView,
         DummyView,
+        NamedView,
+        SelectView,
     },
-    //Cursive,
-    //align::VAlign,
+    view::Nameable,
+    Cursive,
 };
-use cursive_aligned_view::{
-    //AlignedView,
-    Alignable,
-};
+use cursive_aligned_view::Alignable;
 
 fn main() {
     let mut tui: CursiveRunnable = cursive::default();
@@ -33,18 +24,21 @@ fn main() {
     //let num_selections: u8 = syllabus.num_categories() + 2;
     //let mut selection: u8 = 0;
 
-    let mut options: LinearLayout = LinearLayout::vertical();
+    let mut list: LinearLayout = LinearLayout::vertical();
+    let mut options: SelectView<String> = SelectView::new().on_submit(|s: &mut Cursive, _: &str| s.quit());
     for category in syllabus.categories() {
         //TODO: Need to add functionality here besides just quitting the program.
-        options.add_child(Button::new(format!("{}", category.name()), |s| s.quit()));
+        options.add_item_str(format!("{}", category.name()));
     }
 
-    let final_grade: TextView = TextView::new(format!("Current course grade: {} -> {}", "?", "?"));
-    options.add_child(DummyView);
-    options.add_child(final_grade);
+    let final_grade: NamedView<TextView> = TextView::new(format!("Current course grade: {} -> {}", "?", "?")).with_name("final grade");
+
+    list.add_child(options);
+    list.add_child(DummyView);
+    list.add_child(final_grade);
 
     //TODO: Have the current final grade displayed instead of requiring the user to select it
-    tui.add_layer(Dialog::around(options.align_top_left())
+    tui.add_layer(Dialog::around(list.align_top_left())
         .title(format!("{} Grade Calculator", syllabus.name()))
         .button("Quit", |s| s.quit())
     );
@@ -152,5 +146,5 @@ fn main() {
     println!();*/
 
     tui.run();
-    clearscreen::clear();
+    clearscreen::clear().unwrap();
 }
