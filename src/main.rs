@@ -9,13 +9,36 @@ use std::{
 };
 use text_io::read;
 use colored::Colorize;
+use cursive::{
+    CursiveRunnable,
+    views::{
+        Dialog,
+        LinearLayout,
+        Button,
+    },
+    Cursive,
+};
 
 fn main() {
+    let mut tui: CursiveRunnable = cursive::default();
+
     clear_screen();
     let syllabus: Syllabus = Syllabus::new();
     let num_selections: u8 = syllabus.num_categories() + 2;
     let mut selection: u8 = 0;
-    while selection != num_selections {
+
+    let mut options: LinearLayout = LinearLayout::vertical();
+    for category in syllabus.categories() {
+        options.add_child(Button::new(format!("{}", category.1.name()), Cursive::quit));
+    }
+
+    //TODO: Read in course name from syllabus file as well to display in menu
+    tui.add_layer(Dialog::around(options)
+        .title(format!("{} Grade Calculator", "<COURSE NAME>"))
+        .button("Quit", Cursive::quit)
+    );
+
+    /*while selection != num_selections {
         println!("\n------ MENU ------");
         //NOTE: Display the menu and prompt for user input
         for category in syllabus.categories() {
@@ -116,7 +139,9 @@ fn main() {
             }
         }
     }
-    println!();
+    println!();*/
+
+    tui.run();
 }
 
 /**
