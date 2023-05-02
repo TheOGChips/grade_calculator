@@ -29,7 +29,7 @@ use cursive_aligned_view::{
 fn main() {
     let mut tui: CursiveRunnable = cursive::default();
 
-    clear_screen();
+    clear_screen();   //TODO: This needs to go somewhere else
     let syllabus: Syllabus = Syllabus::new();
     //let num_selections: u8 = syllabus.num_categories() + 2;
     //let mut selection: u8 = 0;
@@ -46,7 +46,7 @@ fn main() {
     //TODO: Read in course name from syllabus file as well to display in menu
     //TODO: Have the current final grade displayed instead of requiring the user to select it
     tui.add_layer(Dialog::around(options.align_top_left())
-        .title(format!("{} Grade Calculator", "<COURSE NAME>"))
+        .title(format!("{} Grade Calculator", syllabus.name()))
         .button("Quit", |s| s.quit())
     );
     /*while selection != num_selections {
