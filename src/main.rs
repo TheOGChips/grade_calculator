@@ -11,8 +11,12 @@ use cursive::{
         DummyView,
         NamedView,
         SelectView,
+        EditView,
     },
-    view::Nameable,
+    view::{
+        Nameable,
+        Resizable,
+    },
     Cursive,
 };
 use cursive_aligned_view::Alignable;
@@ -24,12 +28,8 @@ fn main() {
     //let num_selections: u8 = syllabus.num_categories() + 2;
     //let mut selection: u8 = 0;
 
-    let mut list: LinearLayout = LinearLayout::vertical();
     let mut options: SelectView<String> = SelectView::new().on_submit(
-        |s: &mut Cursive, name: &str| s.add_layer(
-            Dialog::around(TextView::new(format!("You will input a grade for {} here", name)))
-                .button("Back", |s| { s.pop_layer(); })
-        )
+        |s: &mut Cursive, name: &str| new_grade_prompt(s, name)
     );
     for category in syllabus.categories() {
         //TODO: Need to add functionality here besides just quitting the program.
@@ -38,6 +38,7 @@ fn main() {
 
     let final_grade: NamedView<TextView> = TextView::new(format!("Current course grade: {} -> {}", "?", "?")).with_name("final grade");
 
+    let mut list: LinearLayout = LinearLayout::vertical();
     list.add_child(options);
     list.add_child(DummyView);
     list.add_child(final_grade);
@@ -152,4 +153,15 @@ fn main() {
 
     tui.run();
     clearscreen::clear().unwrap();
+}
+
+fn new_grade_prompt (s: &mut Cursive, name: &str) {
+    //TODO: Now this needs to add a grade somehow
+    s.add_layer(Dialog::around(
+        LinearLayout::vertical()
+            .child(TextView::new(format!("Enter a new grade for {}:", name)))
+            .child(EditView::new()
+                .fixed_width(5)
+            )
+    ).button("Back", |s| { s.pop_layer(); }));
 }
