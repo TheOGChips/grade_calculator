@@ -215,6 +215,8 @@ impl<'a> Syllabus {
     }
 
     /**
+     * Searches for and returns the `GradeCategory` whose `.name` field matches the `name`
+     * parameter. This should never return `None`.
      */
     pub fn find (&self, name: &str) -> Option<&GradeCategory> {
         for category in self.categories() {
