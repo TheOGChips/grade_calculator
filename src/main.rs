@@ -18,12 +18,13 @@ use cursive::{
         Resizable,
     },
     Cursive,
+    backends::crossterm::crossterm::style::Stylize,
 };
 use cursive_aligned_view::Alignable;
 use std::{
     rc::Rc,
-    //borrow::Borrow,
 };
+//use colored::Colorize;
 
 fn main () {
     let mut tui: CursiveRunnable = cursive::default();
@@ -43,14 +44,15 @@ fn main () {
         options.add_item_str(format!("{}", category.name()));
     }
 
-    let final_grade: NamedView<TextView> = TextView::new(format!("Current course grade: {} -> {}", "?", "?")).with_name("final grade");
+    let final_grade: NamedView<TextView> = TextView::new(format!("Current course grade: {}", total_grade(Rc::clone(&syllabus)))).with_name("total grade");
 
     let mut list: LinearLayout = LinearLayout::vertical();
     list.add_child(options);
     list.add_child(DummyView);
     list.add_child(final_grade);
 
-    //TODO: Have the current final grade displayed instead of requiring the user to select it
+    //TODO: Change some parts of the theme
+    //TODO: Move Quit over to left side
     tui.add_layer(Dialog::around(list.align_top_left())
         .title(format!("{} Grade Calculator", syllabus.name()))
         .button("Quit", |s| s.quit())
@@ -183,12 +185,34 @@ fn new_grade_prompt (s: &mut Cursive, name: &str, syl: Rc<Syllabus>) {
                                 .unwrap();
                             category.add_grade(grade);
                             category.export();
+                            s.call_on_name("total grade",
+                                |view: &mut TextView| view.set_content(
+                                    format!("Current course grade: {}",
+                                            total_grade(Rc::clone(&syl_local))))
+                            );
                             s.pop_layer();
                         },
                         Err(_) => (),
                     }
                 })
-                .fixed_width(5)
+                .fixed_width(5) //TODO: Change this to 6 spaces
             )
     ).button("Back", |s| { s.pop_layer(); }));
+}
+
+fn total_grade (syl: Rc<Syllabus>) -> String {
+    let mut acc: f32 = 0.0;
+    for category in syl.categories() {
+        acc += category.total();
+    }
+    acc *= 100.0;
+    let letter_grade: String =
+        if acc >= 90.0 { format!("{}", "A".magenta().bold()) }
+        else if acc >= 80.0 { format!("{}", "B".green().bold()) }
+        else if acc >= 70.0 { format!("{}", "C".green().bold()) }
+        else if acc >= 60.0 { format!("{}", "D".yellow().bold()) }
+        else { format!("{}", "F".red().bold()) };
+    //clear_screen();
+    //println!("\nCurrent course grade: {} -> {}", acc, letter_grade);
+    return format!("{} -> {}", acc, letter_grade);
 }
