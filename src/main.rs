@@ -18,32 +18,32 @@ use cursive::{
         Resizable,
     },
     Cursive,
-    backends::crossterm::crossterm::style::Stylize,
+    //backends::crossterm::crossterm::style::Stylize,
     align::HAlign,
-    theme::{
+    /*theme::{
         Theme,
         BorderStyle,
         Palette,
-    },
+    },*/
 };
 use cursive_aligned_view::Alignable;
 use std::rc::Rc;
 
 fn main () {
-    /* NOTE: For some reason, the border prints out in a weird black and white color because
-     *       I'm printing out letter grades in different colors. I haven't figured out how to
-     *       change that yet, and I don't know if it's worth trying to figure out. If I ever
-     *       get curious enough, I'll fix it to be the default,  otherwise I'll consider this
+    /* NOTE: For some reason, the border prints out in a weird black and white color when I
+     *       print out letter grades in different colors. I haven't figured out how to change
+     *       that yet, and I don't know if it's worth trying to figure out. If I ever get
+     *       curious enough, I'll fix it to be the default,  otherwise I'll consider this
      *       finished.
      */
-    let theme = Theme {
+    /*let theme = Theme {
         shadow: false,
         borders: BorderStyle::Simple,
         palette: Palette::default(),
-    };
+    };*/
 
     let mut tui: CursiveRunnable = cursive::default();
-    tui.set_theme(theme);
+    //tui.set_theme(theme);
 
     let syllabus: Rc<Syllabus> = Rc::new(Syllabus::new());
 
@@ -110,11 +110,11 @@ fn total_grade (syl: Rc<Syllabus>) -> String {
         acc += category.total();
     }
     acc *= 100.0;
-    let letter_grade: String =
-        if acc >= 90.0 { format!("{}", "A".magenta().bold()) }
-        else if acc >= 80.0 { format!("{}", "B".green().bold()) }
-        else if acc >= 70.0 { format!("{}", "C".green().bold()) }
-        else if acc >= 60.0 { format!("{}", "D".green().bold()) }
-        else { format!("{}", "F".red().bold()) };
+    let letter_grade: char =
+        if acc >= 90.0 { 'A' }
+        else if acc >= 80.0 { 'B' }
+        else if acc >= 70.0 { 'C' }
+        else if acc >= 60.0 { 'D' }
+        else { 'F' };
     return format!("{:.2} -> {}", acc, letter_grade);
 }
