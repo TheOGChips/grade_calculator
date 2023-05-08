@@ -1,6 +1,6 @@
 use grade_calculator::{
     Syllabus,
-    //GradeCategory,
+    GradeCategory,
 };
 use cursive::{
     CursiveRunnable,
@@ -20,16 +20,24 @@ use cursive::{
     Cursive,
 };
 use cursive_aligned_view::Alignable;
+use std::{
+    rc::Rc,
+    //borrow::Borrow,
+};
 
-fn main() {
+fn main () {
     let mut tui: CursiveRunnable = cursive::default();
 
-    let syllabus: Syllabus = Syllabus::new();
+    let syllabus: Rc<Syllabus> = Rc::new(Syllabus::new());
     //let num_selections: u8 = syllabus.num_categories() + 2;
     //let mut selection: u8 = 0;
 
+    let syl_clone: Rc<Syllabus> = Rc::clone(&syllabus);
     let mut options: SelectView<String> = SelectView::new().on_submit(
-        |s: &mut Cursive, name: &str| new_grade_prompt(s, name)
+        move |s: &mut Cursive, name: &str| {
+            let syl_clone: Rc<Syllabus> = Rc::clone(&syl_clone);
+            new_grade_prompt(s, name, syl_clone);
+        }
     );
     for category in syllabus.categories() {
         //TODO: Need to add functionality here besides just quitting the program.
@@ -155,12 +163,34 @@ fn main() {
     clearscreen::clear().unwrap();
 }
 
-fn new_grade_prompt (s: &mut Cursive, name: &str) {
+//BUG: Use Rc to fix lifetime issue?
+fn new_grade_prompt (s: &mut Cursive, name: &str, syl: Rc<Syllabus>) {
+    //TODO: Search for syllabus category first and use it in on_submit somehow
     //TODO: Now this needs to add a grade somehow
+    let syl_local: Rc<Syllabus> = Rc::clone(&syl);
+    let name_local: String = name.to_string();
+    //let name_local: &str = name;
+    /*let category: &'static GradeCategory = match syl_local.find(name) {
+        Some(cat) => cat,
+        None => panic!("Error: Category not found!")
+    };*/
     s.add_layer(Dialog::around(
         LinearLayout::vertical()
             .child(TextView::new(format!("Enter a new grade for {}:", name)))
             .child(EditView::new()
+                .on_submit(move |s, grade| {
+                    match grade.parse::<f32>() {
+                        Ok(grade) => if grade >= 0.0 || grade <= 120.0 {
+                            let name_local: &str = &name_local;
+                            let category: &GradeCategory = syl_local.find(name_local)
+                                .unwrap();
+                            category.add_grade(grade);
+                            category.export();
+                            s.pop_layer();
+                        },
+                        Err(_) => (),
+                    }
+                })
                 .fixed_width(5)
             )
     ).button("Back", |s| { s.pop_layer(); }));

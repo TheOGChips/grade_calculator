@@ -213,6 +213,17 @@ impl<'a> Syllabus {
     pub fn filename (&self) -> &str {
         return Self::FILENAME;
     }
+
+    /**
+     */
+    pub fn find (&self, name: &str) -> Option<&GradeCategory> {
+        for category in self.categories() {
+            if category.name() == name {
+                return Some(&category);
+            }
+        }
+        return None;
+    }
 }
 
 /**
@@ -382,8 +393,11 @@ impl<'a> GradeCategory {
      */
     pub fn add_grade (&self, grade: f32) {
         let scores: &mut Vec<f32> = &mut self.scores().borrow_mut();
-        let index: usize = scores.iter().position(|&x| x == -1.0).unwrap();
-        scores[index] = grade;
+        let index: Option<usize> = scores.iter().position(|&x| x == -1.0);
+        if let Some(index) = index {
+            scores[index] = grade;
+        }
+        //TODO: Signal to print out error message somehow
     }
 
     /**
