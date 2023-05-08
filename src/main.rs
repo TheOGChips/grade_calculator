@@ -222,7 +222,7 @@ fn total_grade (syl: Rc<Syllabus>) -> String {
         if acc >= 90.0 { format!("{}", "A".magenta().bold()) }
         else if acc >= 80.0 { format!("{}", "B".green().bold()) }
         else if acc >= 70.0 { format!("{}", "C".green().bold()) }
-        else if acc >= 60.0 { format!("{}", "D".yellow().bold()) }
+        else if acc >= 60.0 { format!("{}", "D".green().bold()) }
         else { format!("{}", "F".red().bold()) };
     //clear_screen();
     //println!("\nCurrent course grade: {} -> {}", acc, letter_grade);
