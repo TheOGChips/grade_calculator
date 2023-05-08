@@ -1,8 +1,8 @@
 [package]
 name = "grade_calculator"
-version = "1.0.1"
+version = "1.1.0"
 edition = "2021"
-author = "Chris Swindell <swindell.christian.g@gmail.com>"
+authors = ["Chris Swindell <swindell.christian.g@gmail.com>"]
 license = "GPL-3.0-or-later"
 description = "Calculates and keeps track of grades for a single course using information found in the course's syllabus."
 repository = "https://github.com/TheOGChips/grade_calculator"
@@ -13,5 +13,9 @@ categories = ["command-line-utilities"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-colored = "2.0.0"
-text_io = "0.1.12"
+cursive-aligned-view = "0.6.0"
+
+[dependencies.cursive]
+version = "0.20.0"
+default-features = false
+features = ["crossterm-backend"]

@@ -6,9 +6,6 @@ use std::{
     process,
     str::FromStr,
     io::Write,
-    //NOTE: Using BTreeMap to have a guaranteed iteration order in the menu
-    collections::BTreeMap,
-    iter::zip,
     cell::RefCell,
 };
 
@@ -17,7 +14,8 @@ use std::{
  * percentage each category is worth) overall. Also keeps track of the number of categories.
  */
 pub struct Syllabus {
-    categories: BTreeMap<usize, GradeCategory>,
+    name: String,
+    categories: Vec<GradeCategory>,
     num_categories: usize,
 }
 
@@ -70,29 +68,31 @@ impl<'a> Syllabus {
             eprintln!("Error: {} is empty", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
         }
-        else if syllabus.lines().next().unwrap() != HEADER_LINE {
-            eprintln!("Error: {} header line is formatted incorrectly", Self::FILENAME);
+        else if syllabus.lines().skip(1).next().unwrap() != HEADER_LINE {
+            eprintln!("Error: {} header lines are formatted incorrectly", Self::FILENAME);
             Self::display_header_format_msg(HEADER_LINE);
         }
         else if syllabus.lines().count() == 1 {
-            eprintln!("Error: {} has no entries after header line.", Self::FILENAME);
+            eprintln!("Error: {} has no entries after header lines.", Self::FILENAME);
             eprintln!("       At least one entry is required.");
             process::exit(1);
         }
         else {
+            let name: String = syllabus.lines().next().unwrap().to_string();
             let num_categories: usize = syllabus.lines().count() - 1;
-            let mut categories: BTreeMap<usize, GradeCategory> = BTreeMap::new();
+            let mut categories: Vec<GradeCategory> = Vec::new();
 
             /* NOTE:
              * Parse each line of the syllabus file and pass the resulting tuple directly to
              * create a new GradeCategory object.
              */
-            for (line, cat_no) in zip(syllabus.lines().skip(1), 1..=num_categories) {
+            for line in syllabus.lines().skip(2) {
                 let category: GradeCategory = GradeCategory::new(Self::parse_line(line));
-                categories.insert(cat_no, category);
+                categories.push(category);
             }
 
             return Syllabus {
+                name: name,
                 num_categories: num_categories,
                 categories: categories,
             };
@@ -101,7 +101,8 @@ impl<'a> Syllabus {
 
     // Displays an error message if the header line of `syllabus.csv` is improperly formatted.
     fn display_header_format_msg (header_line: &str) -> ! {
-        eprintln!("       Use the following for the header line:");
+        eprintln!("       Use the following for the header lines:");
+        eprintln!("           COURSE NAME");
         eprintln!("           {}\n", header_line);
         eprintln!("       All entries should follow this format.\n");
         process::exit(1);
@@ -182,10 +183,18 @@ impl<'a> Syllabus {
     }
 
     /**
+     * Returns the name of the course this `Syllabus` was created for. This will be the first
+     * line in `syllabus.csv`.
+     */
+    pub fn name (&self) -> &str {
+        return &self.name;
+    }
+
+    /**
      * Returns a binary tree map of the list of categories. Keys are unsigned integers in the
      * range `1..Syllabus::size`. Values are `GradeCategory`s.
      */
-    pub fn categories (&self) -> &BTreeMap<usize, GradeCategory> {
+    pub fn categories (&self) -> &Vec<GradeCategory> {
         return &self.categories;
     }
 
@@ -203,6 +212,19 @@ impl<'a> Syllabus {
      */
     pub fn filename (&self) -> &str {
         return Self::FILENAME;
+    }
+
+    /**
+     * Searches for and returns the `GradeCategory` whose `.name` field matches the `name`
+     * parameter. This should never return `None`.
+     */
+    pub fn find (&self, name: &str) -> Option<&GradeCategory> {
+        for category in self.categories() {
+            if category.name() == name {
+                return Some(&category);
+            }
+        }
+        return None;
     }
 }
 
@@ -293,7 +315,7 @@ impl<'a> GradeCategory {
 
     /* Sorts the grades in the Vec from the scores field.
      */
-    fn sort_scores (&mut self) {
+    fn sort_scores (&self) {
         self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
@@ -302,6 +324,11 @@ impl<'a> GradeCategory {
      * previous contents of `filename`.
      */
     pub fn export (&self) {
+        //NOTE: For some reason, this doesn't crash the GUI if I sort the scores here
+        if self.dropped > 0 {
+            self.sort_scores();
+        }
+
         /* NOTE:
          * Borrow the RefCell and return a Vec with the values converted to
          * Strings for writing to a file later.
@@ -373,8 +400,11 @@ impl<'a> GradeCategory {
      */
     pub fn add_grade (&self, grade: f32) {
         let scores: &mut Vec<f32> = &mut self.scores().borrow_mut();
-        let index: usize = scores.iter().position(|&x| x == -1.0).unwrap();
-        scores[index] = grade;
+        let index: Option<usize> = scores.iter().position(|&x| x == -1.0);
+        if let Some(index) = index {
+            scores[index] = grade;
+        }
+        //TODO: Signal to print out error message somehow
     }
 
     /**
