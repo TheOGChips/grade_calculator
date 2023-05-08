@@ -313,7 +313,7 @@ impl<'a> GradeCategory {
 
     /* Sorts the grades in the Vec from the scores field.
      */
-    fn sort_scores (&mut self) {
+    fn sort_scores (&self) {
         self.scores.borrow_mut().sort_by(|a, b| b.partial_cmp(a).unwrap());
     }
 
@@ -322,6 +322,11 @@ impl<'a> GradeCategory {
      * previous contents of `filename`.
      */
     pub fn export (&self) {
+        //NOTE: For some reason, this doesn't crash the GUI if I sort the scores here
+        if self.dropped > 0 {
+            self.sort_scores();
+        }
+
         /* NOTE:
          * Borrow the RefCell and return a Vec with the values converted to
          * Strings for writing to a file later.

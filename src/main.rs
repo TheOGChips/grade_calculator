@@ -40,7 +40,6 @@ fn main () {
         }
     );
     for category in syllabus.categories() {
-        //TODO: Need to add functionality here besides just quitting the program.
         options.add_item_str(format!("{}", category.name()));
     }
 
@@ -160,13 +159,11 @@ fn main () {
     println!();*/
 
     tui.run();
-    clearscreen::clear().unwrap();
+    //clearscreen::clear().unwrap();
 }
 
-//BUG: Use Rc to fix lifetime issue?
 fn new_grade_prompt (s: &mut Cursive, name: &str, syl: Rc<Syllabus>) {
-    //TODO: Search for syllabus category first and use it in on_submit somehow
-    //TODO: Now this needs to add a grade somehow
+    //TODO: Update total score from here?
     let syl_local: Rc<Syllabus> = Rc::clone(&syl);
     let name_local: String = name.to_string();
     //let name_local: &str = name;
