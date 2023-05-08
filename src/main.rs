@@ -196,7 +196,7 @@ fn new_grade_prompt (s: &mut Cursive, name: &str, syl: Rc<Syllabus>) {
                         Err(_) => (),
                     }
                 })
-                .fixed_width(5) //TODO: Change this to 6 spaces
+                .fixed_width(6)
             )
     ).button("Back", |s| { s.pop_layer(); }));
 }
@@ -215,5 +215,5 @@ fn total_grade (syl: Rc<Syllabus>) -> String {
         else { format!("{}", "F".red().bold()) };
     //clear_screen();
     //println!("\nCurrent course grade: {} -> {}", acc, letter_grade);
-    return format!("{} -> {}", acc, letter_grade);
+    return format!("{} -> {}", acc, letter_grade);  //TODO: Format this to 2 decimal places
 }
