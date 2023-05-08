@@ -20,6 +20,11 @@ use cursive::{
     Cursive,
     backends::crossterm::crossterm::style::Stylize,
     align::HAlign,
+    theme::{
+        Theme,
+        BorderStyle,
+        Palette,
+    },
 };
 use cursive_aligned_view::Alignable;
 use std::{
@@ -28,7 +33,14 @@ use std::{
 //use colored::Colorize;
 
 fn main () {
+    let theme = Theme {
+        shadow: false,
+        borders: BorderStyle::Simple,
+        palette: Palette::default(),
+    };
+
     let mut tui: CursiveRunnable = cursive::default();
+    tui.set_theme(theme);
 
     let syllabus: Rc<Syllabus> = Rc::new(Syllabus::new());
     //let num_selections: u8 = syllabus.num_categories() + 2;
