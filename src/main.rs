@@ -11,7 +11,6 @@ use text_io::read;
 use colored::Colorize;
 
 fn main() {
-    clear_screen();
     let syllabus: Syllabus = Syllabus::new();
     let num_selections: u8 = syllabus.num_categories() + 2;
     let mut selection: u8 = 0;
