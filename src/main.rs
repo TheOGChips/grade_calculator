@@ -19,6 +19,7 @@ use cursive::{
     },
     Cursive,
     backends::crossterm::crossterm::style::Stylize,
+    align::HAlign,
 };
 use cursive_aligned_view::Alignable;
 use std::{
@@ -52,10 +53,10 @@ fn main () {
     list.add_child(final_grade);
 
     //TODO: Change some parts of the theme
-    //TODO: Move Quit over to left side
     tui.add_layer(Dialog::around(list.align_top_left())
         .title(format!("{} Grade Calculator", syllabus.name()))
         .button("Quit", |s| s.quit())
+        .h_align(HAlign::Left)
     );
     /*while selection != num_selections {
         println!("\n------ MENU ------");
