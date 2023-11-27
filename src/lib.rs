@@ -366,7 +366,8 @@ impl<'a> GradeCategory {
          * Accumulate a category total by iterating through the scores Vec,
          * mapping -1 -> 0 for adding to the accumulator.
          */
-        let mut total: f32 = self.scores.borrow()
+        let not_dropped: usize = self.scores.borrow().len() - self.dropped as usize;
+        let mut total: f32 = self.scores.borrow()[..not_dropped]
             .iter()
             .map(|&score|
                 if score < 0.0 {
